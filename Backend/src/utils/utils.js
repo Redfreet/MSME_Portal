@@ -1,15 +1,13 @@
 import jwt from "jsonwebtoken";
 
-export const generateToken = (userId, res) => {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+export const generateToken = (userId) => {
+  const secret = process.env.SECRET_KEY;
+  if (!secret) {
+    console.error("JWT Secret Key is not defined in .env file");
+    throw new error("JWT Secret Key is not configured");
+  }
+  const token = jwt.sign({ userId }, secret, {
     expiresIn: "7d",
-  });
-
-  res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV !== "development",
   });
 
   return token;

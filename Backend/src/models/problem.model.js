@@ -10,17 +10,25 @@ const problemSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["collaborator", "corporate"],
-      required: true,
+    skills_needed: {
+      type: [String],
+      default: [],
     },
-    skills_needed: [{ type: String }],
+    tags: {
+      type: [String],
+      default: [],
+    },
+    status: {
+      type: String,
+      enum: ["Open", "In Progress", "Closed", "Solved"],
+      default: "Open",
+    },
   },
   { timestamps: true }
 );

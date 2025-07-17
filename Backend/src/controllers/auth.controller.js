@@ -63,9 +63,9 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
   try {
-    if (!email || !password || !role) {
+    if (!email || !password) {
       return res.status(400).json({
         message: "Something is missing",
         success: false,
@@ -86,23 +86,24 @@ export const login = async (req, res) => {
         .json({ message: "Invalid credentials", success: false });
     }
 
-    if (role != user.role) {
-      return res.status(400).json({
-        message: "Account doesn't exist with current role",
-        success: false,
+    const token = generateToken(user._id);
+
+    res
+      .status(200)
+      .cookie("jwt", token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV !== "development",
+      })
+      .json({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
       });
-    }
-
-    generateToken(user._id, res);
-
-    res.status(200).json({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-    });
   } catch (error) {
-    console.log("Error in login controller");
+    console.log("Error in login controller", error);
     res.status(500).json({ message: "Internet Server Error" });
   }
 };
