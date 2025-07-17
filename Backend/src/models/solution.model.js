@@ -7,18 +7,19 @@ const solutionSchema = new mongoose.Schema(
       ref: "Problem",
       required: true,
     },
-    studentId: {
+    collaboratorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    description: {
+    content: {
       type: String,
-      required: true,
+      required: [true, "Solution content is required"],
     },
-    solution_text: {
+    status: {
       type: String,
-      required: true,
+      enum: ["Submitted", "Under Review", "Accepted", "Rejected"],
+      default: "Submitted",
     },
   },
   { timestamps: true }
