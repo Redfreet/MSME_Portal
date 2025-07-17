@@ -1,8 +1,9 @@
+import { generateToken } from "../utils/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/utils.js";
 
 export const signup = async (req, res) => {
+  // console.log("Request body received:", req.body);
   const { fullName, email, password, role, profile, industry, website } =
     req.body;
   try {
@@ -33,11 +34,11 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      profile: {
-        bio: profile?.bio || " ",
-        skills: profile?.skills || " ",
-        profilePhoto: profile?.profilePhoto || " ",
-      },
+      // profile: {
+      //   bio: profile?.bio || "",
+      //   skills: profile?.skills || [],
+      //   profilePhoto: profile?.profilePhoto || "",
+      // },
       industry: role === "corporate" ? industry : undefined,
       website: role === "corporate" ? website : undefined,
     });
