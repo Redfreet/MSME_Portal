@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     fullName: {
+      // person or Company
       type: String,
       required: true,
     },
@@ -24,12 +25,13 @@ const userSchema = new mongoose.Schema(
     profile: {
       bio: { type: String },
       skills: [{ type: String }],
-      company: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
       profilePhoto: {
         type: String,
         default: "",
       },
     },
+    industry: { type: String },
+    website: { type: String },
   },
   { timestamps: true }
 );
