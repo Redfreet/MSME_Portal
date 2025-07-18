@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import ProblemDetailPage from "./pages/ProblemDetail.page";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -37,6 +38,8 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
 
             <Route path="/signup" element={<SignupPage />} />
+
+            <Route path="/problem/:id" element={<ProblemDetailPage />} />
           </Routes>
         </main>
       </div>
