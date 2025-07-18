@@ -1,4 +1,5 @@
 import { useAuth } from "../context/AuthContent";
+import ActivityStream from "../components/ActivityStream";
 
 const ProfilePage = () => {
   const { authUser, loading } = useAuth(); //early loaded so no content on profile
@@ -15,14 +16,30 @@ const ProfilePage = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-4xl font-bold text-gray-900">
-          {authUser.fullName}
-        </h1>
-        <p className="text-lg text-blue-600 font-semibold capitalize mt-1">
-          {authUser.role}
-        </p>
+        {/* --- Profile Header with Picture --- */}
+        <div className="flex items-center space-x-6 mb-6">
+          <img
+            className="h-24 w-24 rounded-full ring-4 ring-blue-100"
+            src={
+              authUser.profile?.profilePhoto ||
+              `https://placehold.co/100x100/EFEFEF/AAAAAA?text=${authUser.fullName.charAt(
+                0
+              )}`
+            }
+            alt="Profile"
+          />
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">
+              {authUser.fullName}
+            </h1>
+            <p className="text-lg text-blue-600 font-semibold capitalize mt-1">
+              {authUser.role}
+            </p>
+          </div>
+        </div>
 
-        <div className="mt-6 border-t border-gray-200 pt-6">
+        {/* --- User Details --- */}
+        <div className="border-t border-gray-200 pt-6">
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
             <div className="sm:col-span-1">
               <dt className="text-sm font-medium text-gray-500">
@@ -69,12 +86,7 @@ const ProfilePage = () => {
       </div>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-gray-800">My Activity</h2>
-        <div className="mt-4 bg-white p-6 rounded-lg shadow-md">
-          <p className="text-gray-500">
-            Your posted problems or submitted solutions will appear here.
-          </p>
-        </div>
+        <ActivityStream />
       </div>
     </div>
   );

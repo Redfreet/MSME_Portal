@@ -24,11 +24,16 @@ const getMe = () => {
   return axios.get(`${API_URL}/user/me`, config);
 };
 
+const getActivity = () => {
+  return axios.get(`${API_URL}/user/activity`, config);
+};
+
 const authService = {
   signup,
   login,
   logout,
   getMe,
+  getActivity,
 };
 
 export default authService;
