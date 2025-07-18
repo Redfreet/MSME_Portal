@@ -1,6 +1,7 @@
 import { generateToken } from "../utils/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import Activity from "../models/activity.model.js";
 
 export const signup = async (req, res) => {
   // console.log("Request body received:", req.body);
@@ -115,5 +116,23 @@ export const logout = (req, res) => {
   } catch (error) {
     console.log("Error in login controller");
     res.status(500).json({ message: "Internet Server Error" });
+  }
+};
+
+export const getUserActivity = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log(
+      `Fetching activity feed from Activity collection for user: ${userId}`
+    );
+
+    const activities = await Activity.find({ userId: userId })
+      .sort({ createdAt: -1 }) // most recent first
+      .limit(20) // Limit to the last 20 activities
+      .lean();
+    res.status(200).json(activities);
+  } catch (error) {
+    console.log("Error in getUserActivity controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

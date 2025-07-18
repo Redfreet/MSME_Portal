@@ -1,5 +1,6 @@
 import Solution from "../models/solution.model.js";
 import Problem from "../models/problem.model.js";
+import Activity from "../models/activity.model.js";
 
 export const submitSolution = async (req, res) => {
   const { problemId } = req.params;
@@ -24,6 +25,17 @@ export const submitSolution = async (req, res) => {
     });
 
     const savedSolution = await newSolution.save();
+
+    //new activity document after the solution is saved.
+    const activity = new Activity({
+      userId: req.user.id,
+      type: "SUBMITTED_SOLUTION",
+      title: `You submitted a solution for: "${problem.title}"`,
+      entityId: savedSolution._id,
+      entityModel: "Solution",
+    });
+    await activity.save();
+
     res.status(201).json(savedSolution);
   } catch (error) {
     console.error("Error submitting solution:", error);

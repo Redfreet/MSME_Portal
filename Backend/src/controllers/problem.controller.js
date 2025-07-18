@@ -1,5 +1,5 @@
 import Problem from "../models/problem.model.js";
-import User from "../models/user.model.js";
+import Activity from "../models/activity.model.js";
 
 export const createProblem = async (req, res) => {
   const { title, description, skills_needed, tags } = req.body;
@@ -20,6 +20,17 @@ export const createProblem = async (req, res) => {
     });
 
     const problem = await newProblem.save();
+
+    // Create a new activity document after the problem is successfully saved.
+    const activity = new Activity({
+      userId: req.user.id,
+      type: "POSTED_PROBLEM",
+      title: `You posted the problem: "${problem.title}"`,
+      entityId: problem._id,
+      entityModel: "Problem",
+    });
+
+    await activity.save();
     res.status(201).json(problem);
   } catch (error) {
     console.error(error.message);
@@ -56,7 +67,7 @@ export const getProblemById = async (req, res) => {
     if (err.kind === "ObjectId") {
       return res.status(404).json({ message: "Problem not found" });
     }
-    console.error(error.message);
+    console.error(err.message);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -68,7 +79,7 @@ export const getMyProblems = async (req, res) => {
     });
     res.json(problems);
   } catch (err) {
-    console.error(error.message);
+    console.error(err.message);
     res.status(500).send("Internal Server Error");
   }
 };
