@@ -26,11 +26,16 @@ const submitSolution = (id, solutionData) => {
   );
 };
 
+const createProblem = (problemData) => {
+  return axios.post(`${API_URL}/problems`, problemData, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
   getSolutionsForProblem,
   submitSolution,
+  createProblem,
 };
 
 export default problemService;

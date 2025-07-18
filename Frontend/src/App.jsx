@@ -8,6 +8,8 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProblemDetailPage from "./pages/ProblemDetail.page";
+import ProtectedRoute from "./components/ProtectedRoute";
+import CreateProblemPage from "./pages/CreateProblem.page";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -34,12 +36,14 @@ function App() {
         <main className="container mx-auto p-4">
           <Routes>
             <Route path="/" element={<HomePage />} />
-
             <Route path="/login" element={<LoginPage />} />
-
             <Route path="/signup" element={<SignupPage />} />
-
             <Route path="/problem/:id" element={<ProblemDetailPage />} />
+
+            <Route element={<ProtectedRoute allowedRoles={["corporate"]} />}>
+              <Route path="/create-problem" element={<CreateProblemPage />} />
+              {/* You can add more corporate-only routes here later */}
+            </Route>
           </Routes>
         </main>
       </div>

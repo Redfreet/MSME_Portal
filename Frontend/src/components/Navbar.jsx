@@ -33,6 +33,16 @@ const Navbar = () => {
           ) : authUser ? (
             // If user is logged in
             <>
+              {/* Show 'Post a Problem' link only for corporate users */}
+              {authUser.role === "corporate" && (
+                <Link
+                  to="/create-problem"
+                  className="hover:text-blue-400 transition-colors"
+                >
+                  Post a Problem
+                </Link>
+              )}
+
               <span className="font-semibold">
                 Welcome, {authUser.fullName}!
               </span>
