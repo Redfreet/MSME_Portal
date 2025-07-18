@@ -10,6 +10,7 @@ import SignupPage from "./pages/SignupPage";
 import ProblemDetailPage from "./pages/ProblemDetail.page";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateProblemPage from "./pages/CreateProblem.page";
+import ProfilePage from "./pages/Profile.page";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -43,6 +44,19 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={["corporate"]} />}>
               <Route path="/create-problem" element={<CreateProblemPage />} />
               {/* You can add more corporate-only routes here later */}
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["corporate"]} />}>
+              <Route path="/create-problem" element={<CreateProblemPage />} />
+            </Route>
+
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={["corporate", "collaborator"]} />
+              }
+            >
+              {/*profile route */}
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
           </Routes>
         </main>

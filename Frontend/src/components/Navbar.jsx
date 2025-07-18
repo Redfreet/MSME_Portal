@@ -43,9 +43,12 @@ const Navbar = () => {
                 </Link>
               )}
 
-              <span className="font-semibold">
+              <Link
+                to="/profile"
+                className="font-semibold hover:text-blue-400 transition-colors"
+              >
                 Welcome, {authUser.fullName}!
-              </span>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition-colors"
