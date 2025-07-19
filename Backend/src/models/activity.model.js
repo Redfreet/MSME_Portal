@@ -33,6 +33,10 @@ const activitySchema = new mongoose.Schema(
       required: true,
       enum: ["Problem", "Solution"],
     },
+    focusId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+    },
   },
   { timestamps: true }
 );

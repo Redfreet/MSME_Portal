@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import problemService from "../api/problemService.api.js";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "../components/SolutionForm";
@@ -31,6 +31,30 @@ const ProblemDetailPage = () => {
 
     fetchData();
   }, [id]);
+
+  // --- 2. Updated useEffect for auto-scrolling ---
+  useEffect(() => {
+    // Only run this logic after the data has finished loading and solutions are populated
+    if (!loading && location.hash && solutions.length > 0) {
+      try {
+        const elementId = location.hash.substring(1);
+        const element = document.getElementById(elementId);
+
+        if (element) {
+          // A short timeout can help ensure the DOM is fully painted before scrolling
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+            element.style.backgroundColor = "#f0f8ff"; // Highlight effect
+            setTimeout(() => {
+              element.style.backgroundColor = ""; // Remove highlight
+            }, 2000);
+          }, 100); // Small delay of 100ms
+        }
+      } catch (e) {
+        console.error("Failed to scroll to element:", e);
+      }
+    }
+  }, [loading, location.hash, solutions]);
 
   //update on submitting new sol
   const handleNewSolution = (newSolution) => {

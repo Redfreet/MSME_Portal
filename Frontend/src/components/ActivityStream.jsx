@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import authService from "../api/authService.js";
+import { Link } from "react-router-dom";
 
 const timeAgo = (dateString) => {
   const date = new Date(dateString);
@@ -45,6 +46,7 @@ const ActivityStream = () => {
       try {
         setLoading(true);
         const response = await authService.getActivity();
+        // console.log("API Response for Activity:", response.data);
         setActivities(response.data);
       } catch (err) {
         setError("Failed to load activity.");
@@ -81,36 +83,50 @@ const ActivityStream = () => {
       <div className="flow-root">
         <ul className="-mb-8">
           {activities.length > 0 ? (
-            activities.map((activity, index) => (
-              <li key={activity._id}>
-                <div className="relative pb-8">
-                  {/* Vertical line connector, but not for the last item */}
-                  {index !== activities.length - 1 ? (
-                    <span
-                      className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                  <div className="relative flex items-start space-x-3">
-                    <div className="relative">
-                      <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center ring-8 ring-white">
-                        <ActivityIcon type={activity.type} />
+            activities.map((activity, index) => {
+              //link path
+              let linkPath = `/problem/${activity.entityId}`;
+              //add the solution ID as a hash for scrolling
+              if (activity.type === "SUBMITTED_SOLUTION" && activity.focusId) {
+                linkPath += `#solution-${activity.focusId}`;
+              }
+
+              return (
+                <li key={activity._id}>
+                  {/*Wrap the activity item in a Link*/}
+                  <Link
+                    to={linkPath}
+                    className="block hover:bg-gray-50 p-2 rounded-md -mx-2"
+                  >
+                    <div className="relative pb-8">
+                      {index !== activities.length - 1 ? (
+                        <span
+                          className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                      <div className="relative flex items-start space-x-3">
+                        <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
+                          <ActivityIcon type={activity.type} />
+                        </div>
+                        <div className="min-w-0 flex-1 py-1.5">
+                          <div className="text-sm text-gray-700">
+                            {activity.title}
+                          </div>
+                          <div className="mt-1 text-xs text-gray-400">
+                            {timeAgo(activity.createdAt)}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="min-w-0 flex-1 py-1.5">
-                      <div className="text-sm text-gray-700">
-                        {activity.title}
-                      </div>
-                      <div className="mt-1 text-xs text-gray-400">
-                        {timeAgo(activity.createdAt)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))
+                  </Link>
+                </li>
+              );
+            })
           ) : (
-            <p className="text-gray-500">No recent activity to display.</p>
+            <p className="text-gray-500 text-center">
+              No recent activity to display.
+            </p>
           )}
         </ul>
       </div>

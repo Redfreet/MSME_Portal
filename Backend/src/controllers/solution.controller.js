@@ -31,8 +31,9 @@ export const submitSolution = async (req, res) => {
       userId: req.user.id,
       type: "SUBMITTED_SOLUTION",
       title: `You submitted a solution for: "${problem.title}"`,
-      entityId: savedSolution._id,
-      entityModel: "Solution",
+      entityId: problem._id, //to go to prblm link from activity
+      entityModel: "Problem",
+      focusId: savedSolution._id, //the specific solution to scroll
     });
     await activity.save();
 
