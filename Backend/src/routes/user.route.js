@@ -4,6 +4,7 @@ import {
   logout,
   signup,
   getUserActivity,
+  updateUserProfile,
 } from "../controllers/auth.controller.js";
 import { isAuthenticated } from "../middleware/auth.middleware.js";
 
@@ -19,4 +20,5 @@ router.get("/me", isAuthenticated, (req, res) => {
 
 router.get("/activity", isAuthenticated, getUserActivity);
 
+router.put("/profile", isAuthenticated, updateUserProfile);
 export default router;

@@ -136,3 +136,40 @@ export const getUserActivity = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.fullName = req.body.fullName || user.fullName;
+      user.email = req.body.email || user.email;
+
+      if (user.role === "collaborator") {
+        user.profile.bio = req.body.bio || user.profile.bio;
+      }
+
+      if (user.role === "corporate") {
+        user.industry = req.body.industry || user.industry;
+        user.website = req.body.website || user.website;
+      }
+
+      const updatedUser = await user.save();
+
+      res.status(200).json({
+        _id: updatedUser._id,
+        fullName: updatedUser.fullName,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        profile: updatedUser.profile,
+        industry: updatedUser.industry,
+        website: updatedUser.website,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.log("Error in updateUserProfile controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

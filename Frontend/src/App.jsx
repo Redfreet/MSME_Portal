@@ -11,6 +11,7 @@ import ProblemDetailPage from "./pages/ProblemDetail.page";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateProblemPage from "./pages/CreateProblem.page";
 import ProfilePage from "./pages/Profile.page";
+import EditProfilePage from "./pages/editProfile.page";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -43,11 +44,6 @@ function App() {
 
             <Route element={<ProtectedRoute allowedRoles={["corporate"]} />}>
               <Route path="/create-problem" element={<CreateProblemPage />} />
-              {/* You can add more corporate-only routes here later */}
-            </Route>
-
-            <Route element={<ProtectedRoute allowedRoles={["corporate"]} />}>
-              <Route path="/create-problem" element={<CreateProblemPage />} />
             </Route>
 
             <Route
@@ -57,6 +53,8 @@ function App() {
             >
               {/*profile route */}
               <Route path="/profile" element={<ProfilePage />} />
+              {/* 2. Add the new route for editing the profile here */}
+              <Route path="/profile/edit" element={<EditProfilePage />} />
             </Route>
           </Routes>
         </main>

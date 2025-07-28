@@ -28,12 +28,17 @@ const getActivity = () => {
   return axios.get(`${API_URL}/user/activity`, config);
 };
 
+const updateProfile = (profileData) => {
+  return axios.put(`${API_URL}/user/profile`, profileData, config);
+};
+
 const authService = {
   signup,
   login,
   logout,
   getMe,
   getActivity,
+  updateProfile,
 };
 
 export default authService;
