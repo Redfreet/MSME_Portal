@@ -14,13 +14,13 @@ const getProblemById = (id) => {
   return axios.get(`${API_URL}/problems/${id}`, config);
 };
 
-const getSolutionsForProblem = (id) => {
-  return axios.get(`${API_URL}/problems/${id}/solutions`, config);
+const getSolutionsForProblem = (problemId) => {
+  return axios.get(`${API_URL}/solutions/problem/${problemId}`, config);
 };
 
-const submitSolution = (id, solutionData) => {
+const submitSolution = (problemId, solutionData) => {
   return axios.post(
-    `${API_URL}/problems/${id}/solutions`,
+    `${API_URL}/solutions/problem/${problemId}`,
     solutionData,
     config
   );
@@ -30,12 +30,17 @@ const createProblem = (problemData) => {
   return axios.post(`${API_URL}/problems`, problemData, config);
 };
 
+const upvoteSolution = (solutionId) => {
+  return axios.put(`${API_URL}/solutions/${solutionId}/upvote`, {}, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
   getSolutionsForProblem,
   submitSolution,
   createProblem,
+  upvoteSolution,
 };
 
 export default problemService;

@@ -63,3 +63,29 @@ export const getSolutionsForProblem = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+export const toggleUpvoteSolution = async (req, res) => {
+  try {
+    const solution = await Solution.findById(req.params.id);
+    if (!solution) {
+      return res.status(404).json({ message: "Solution not found" });
+    }
+
+    const userId = req.user._id;
+
+    // Check if the user has already upvoted this solution
+    const upvoteIndex = solution.upvotes.indexOf(userId);
+
+    if (upvoteIndex === -1) {
+      solution.upvotes.push(userId);
+    } else {
+      solution.upvotes.splice(upvoteIndex, 1);
+    }
+
+    await solution.save();
+    res.status(200).json(solution);
+  } catch (error) {
+    console.error("Error in toggleUpvoteSolution controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

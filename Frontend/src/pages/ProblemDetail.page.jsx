@@ -40,8 +40,28 @@ const ProblemDetailPage = () => {
         _id: authUser._id,
         fullName: authUser.fullName,
       },
+      upvotes: [],
     };
     setSolutions([populatedSolution, ...solutions]);
+  };
+
+  //FUNCTION TO HANDLE UPVOTING
+  const handleUpvote = async (solutionId) => {
+    if (!authUser) {
+      alert("Please log in to upvote.");
+      return;
+    }
+    try {
+      const response = await problemService.upvoteSolution(solutionId);
+      const updatedSolution = response.data;
+
+      setSolutions(
+        solutions.map((s) => (s._id === solutionId ? updatedSolution : s))
+      );
+    } catch (err) {
+      console.error("Failed to upvote solution:", err);
+      alert("There was an error processing your vote.");
+    }
   };
 
   if (loading) {
@@ -82,20 +102,43 @@ const ProblemDetailPage = () => {
         </h2>
         <div className="space-y-6">
           {solutions.length > 0 ? (
-            solutions.map((solution) => (
-              <div key={solution._id} className="border-b border-gray-200 pb-4">
-                <div className="flex items-center mb-2">
-                  <p className="font-bold text-gray-800">
-                    {solution.collaboratorId?.fullName}
-                  </p>
-                  <span className="text-xs text-gray-500 mx-2">•</span>
-                  <p className="text-xs text-gray-500">
-                    {new Date(solution.createdAt).toLocaleDateString()}
-                  </p>
+            solutions.map((solution) => {
+              // --- THIS VARIABLE WAS MISSING ---
+              const isUpvoted =
+                authUser && solution.upvotes.includes(authUser._id);
+              return (
+                <div
+                  key={solution._id}
+                  className="border-b border-gray-200 pb-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <p className="font-bold text-gray-800">
+                        {solution.collaboratorId?.fullName}
+                      </p>
+                      <span className="text-xs text-gray-500 mx-2">•</span>
+                      <p className="text-xs text-gray-500">
+                        {new Date(solution.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    {/* --- THIS BUTTON WAS CORRECTED --- */}
+                    <button
+                      onClick={() => handleUpvote(solution._id)}
+                      className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm transition-colors ${
+                        isUpvoted
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                      disabled={!authUser}
+                    >
+                      <span>👍</span>
+                      <span>{solution.upvotes.length}</span>
+                    </button>
+                  </div>
+                  <p className="text-gray-700">{solution.content}</p>
                 </div>
-                <p className="text-gray-700">{solution.content}</p>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-gray-500">
               No solutions have been submitted yet. Be the first to comment!
@@ -104,7 +147,6 @@ const ProblemDetailPage = () => {
         </div>
       </div>
 
-      {/*add a form to submit a new solution here */}
       {authUser && (
         <SolutionForm problemId={id} onSolutionSubmit={handleNewSolution} />
       )}

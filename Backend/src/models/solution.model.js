@@ -21,6 +21,12 @@ const solutionSchema = new mongoose.Schema(
       enum: ["Submitted", "Under Review", "Accepted", "Rejected"],
       default: "Submitted",
     },
+    upvotes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -23,10 +23,6 @@ const Navbar = () => {
           MSME Portal
         </Link>
         <div className="flex items-center gap-6 text-lg">
-          <Link to="/" className="hover:text-blue-400 transition-colors">
-            Home
-          </Link>
-
           {/* Conditional rendering based on auth state */}
           {loading ? (
             <span>Loading...</span>

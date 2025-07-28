@@ -19,6 +19,6 @@ router.get("/my", isAuthenticated, authorize("corporate"), getMyProblems);
 
 router.get("/:id", getProblemById);
 
-router.use("/:problemId/solutions", solutionRoutes); //if found let solution route handle it
+// router.use("/:problemId/solutions", solutionRoutes); //if found let solution route handle it
 
 export default router;
