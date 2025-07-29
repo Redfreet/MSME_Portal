@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
 
-const ProblemCard = ({ problem }) => {
+const ProblemCard = ({ problem, isClosed = false }) => {
   const { _id, title, description, tags, companyId } = problem;
 
+  const cardClasses = `
+    bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all ${
+      isClosed ? "opacity-70 bg-gray-50 hover:scale-100" : "hover:scale-105"
+    }`;
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+    <div className={cardClasses}>
       <div className="mb-4">
         <p className="text-sm text-gray-500 font-semibold">
           {companyId?.fullName || "A Company"}

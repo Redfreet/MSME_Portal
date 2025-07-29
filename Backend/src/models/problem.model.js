@@ -26,7 +26,7 @@ const problemSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Open", "In Progress", "Closed", "Solved"],
+      enum: ["Open", "Closed"],
       default: "Open",
     },
   },

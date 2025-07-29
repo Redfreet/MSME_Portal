@@ -4,6 +4,7 @@ import {
   getAllProblems,
   getProblemById,
   getMyProblems,
+  updateProblemStatus,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
@@ -20,5 +21,11 @@ router.get("/my", isAuthenticated, authorize("corporate"), getMyProblems);
 router.get("/:id", getProblemById);
 
 // router.use("/:problemId/solutions", solutionRoutes); //if found let solution route handle it
+router.put(
+  "/:id/status",
+  isAuthenticated,
+  authorize("corporate"),
+  updateProblemStatus
+);
 
 export default router;

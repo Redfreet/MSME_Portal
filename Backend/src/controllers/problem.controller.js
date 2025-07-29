@@ -40,11 +40,19 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
   try {
-    const problems = await Problem.find()
+    const allProblems = await Problem.find()
       .populate("companyId", "fullName industry")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    res.json(problems);
+    const openProblems = allProblems.filter(
+      (p) => p && p.status && p.status === "Open"
+    );
+    const closedProblems = allProblems.filter(
+      (p) => p && p.status && p.status === "Closed"
+    );
+
+    res.status(200).json({ openProblems, closedProblems });
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Internal Server Error");
@@ -80,6 +88,40 @@ export const getMyProblems = async (req, res) => {
     res.json(problems);
   } catch (err) {
     console.error(err.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const updateProblemStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const problem = await Problem.findById(req.params.id);
+
+    if (!problem) {
+      return res.status(404).json({ message: "Problem not found" });
+    }
+
+    // Authorization check user who created the problem can change its status.
+    if (problem.companyId.toString() !== req.user.id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "User not authorized to update this problem" });
+    }
+
+    // Validate the new status to ensure it's one of the allowed values
+    const allowedStatuses = ["Open", "Closed"];
+    if (!status || !allowedStatuses.includes(status)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing status value" });
+    }
+
+    problem.status = status;
+    await problem.save();
+
+    res.status(200).json(problem);
+  } catch (error) {
+    console.error("Error updating problem status:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };

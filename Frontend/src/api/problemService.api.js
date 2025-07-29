@@ -34,6 +34,14 @@ const upvoteSolution = (solutionId) => {
   return axios.put(`${API_URL}/solutions/${solutionId}/upvote`, {}, config);
 };
 
+const updateProblemStatus = (problemId, status) => {
+  return axios.put(
+    `${API_URL}/problems/${problemId}/status`,
+    { status },
+    config
+  );
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -41,6 +49,7 @@ const problemService = {
   submitSolution,
   createProblem,
   upvoteSolution,
+  updateProblemStatus,
 };
 
 export default problemService;
