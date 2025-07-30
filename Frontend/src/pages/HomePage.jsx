@@ -8,66 +8,159 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // State for filters
+  const [industries, setIndustries] = useState([]);
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
-    const fetchProblems = async () => {
+    const fetchIndustries = async () => {
       try {
-        const response = await problemService.getAllProblems();
-        const { openProblems, closedProblems } = response.data;
-        setOpenProblems(openProblems || []);
-        setClosedProblems(closedProblems || []);
+        const response = await problemService.getAllIndustries();
+        setIndustries(response.data || []);
       } catch (err) {
-        setError("Failed to fetch problems. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoading(false);
+        console.error("Failed to fetch industries:", err);
       }
     };
-
-    fetchProblems();
+    fetchIndustries();
   }, []);
 
-  if (loading) {
-    return <p className="text-center text-gray-500">Loading problems...</p>;
-  }
+  // Effect to fetch problems whenever a filter changes
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      const fetchProblems = async () => {
+        setLoading(true);
+        try {
+          const params = {};
+          if (selectedIndustry) {
+            params.industry = selectedIndustry;
+          }
+          if (searchTerm) {
+            params.search = searchTerm;
+          }
+
+          const response = await problemService.getAllProblems(params);
+          const { openProblems, closedProblems } = response.data;
+          setOpenProblems(openProblems || []);
+          setClosedProblems(closedProblems || []);
+        } catch (err) {
+          setError("Failed to fetch problems. Please try again later.");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProblems();
+    }, 300); // 300ms delay to prevent API calls on every keystroke
+
+    return () => clearTimeout(debounceTimer);
+  }, [selectedIndustry, searchTerm]);
 
   if (error) {
-    return <p className="text-center text-red-500">{error}</p>;
+    return <p className="text-center text-red-500 mt-8">{error}</p>;
   }
 
   return (
-    <div>
-      {/* --- Section for Open Problems --- */}
-      <h1 className="text-4xl font-bold text-center mb-8">Open Problems</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {openProblems.length > 0 ? (
-          openProblems.map((problem) => (
-            <ProblemCard key={problem._id} problem={problem} />
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500">
-            There are no open problems at the moment.
-          </p>
-        )}
-      </div>
-
-      {/* --- Section for Closed Problems --- */}
-      {closedProblems.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-600">
-            Closed Problems
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {closedProblems.map((problem) => (
-              // We pass an `isClosed` prop to style the card differently
-              <ProblemCard
-                key={problem._id}
-                problem={problem}
-                isClosed={true}
-              />
+    <div className="flex flex-col md:flex-row gap-8">
+      {/* --- Sidebar for Industry Filtering --- */}
+      <aside className="w-full md:w-1/4 lg:w-1/5">
+        <div className="bg-white p-4 rounded-lg shadow-md sticky top-24">
+          <h2 className="text-lg font-bold mb-4 border-b pb-2">Industries</h2>
+          <ul>
+            <li
+              onClick={() => setSelectedIndustry(null)}
+              className={`p-2 rounded-md cursor-pointer ${
+                !selectedIndustry
+                  ? "bg-blue-500 text-white"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              All Industries
+            </li>
+            {industries.map((industry) => (
+              <li
+                key={industry}
+                onClick={() => setSelectedIndustry(industry)}
+                className={`p-2 mt-1 rounded-md cursor-pointer capitalize ${
+                  selectedIndustry === industry
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                {industry}
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
-      )}
+      </aside>
+
+      {/* --- Main Content: Search and Problem List --- */}
+      <main className="w-full md:w-3/4 lg:w-4/5">
+        {/* Search Bar */}
+        <div className="relative mb-8">
+          <input
+            type="text"
+            placeholder="Search by title or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-4 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </span>
+        </div>
+
+        {loading ? (
+          <p className="text-center text-gray-500">Loading problems...</p>
+        ) : (
+          <>
+            {/* Open Problems Section */}
+            <h1 className="text-3xl font-bold mb-4">Open Problems</h1>
+            <div className="space-y-6">
+              {openProblems.length > 0 ? (
+                openProblems.map((problem) => (
+                  <ProblemCard key={problem._id} problem={problem} />
+                ))
+              ) : (
+                <p className="text-center text-gray-500 bg-white p-6 rounded-lg shadow-md">
+                  No open problems match your criteria.
+                </p>
+              )}
+            </div>
+
+            {/* Closed Problems Section */}
+            {closedProblems.length > 0 && (
+              <div className="mt-12">
+                <h2 className="text-2xl font-bold mb-4 text-gray-600">
+                  Closed Problems
+                </h2>
+                <div className="space-y-6">
+                  {closedProblems.map((problem) => (
+                    <ProblemCard
+                      key={problem._id}
+                      problem={problem}
+                      isClosed={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </main>
     </div>
   );
 };

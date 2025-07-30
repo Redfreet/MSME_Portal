@@ -5,10 +5,10 @@ import {
   getProblemById,
   getMyProblems,
   updateProblemStatus,
+  getAllTags,
+  getAllIndustries,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
-
-import solutionRoutes from "./solution.route.js"; //Solution route is nested to problem i was making mistake here.
 
 const router = express.Router();
 
@@ -17,6 +17,10 @@ router.post("/", isAuthenticated, authorize("corporate"), createProblem);
 router.get("/", getAllProblems);
 
 router.get("/my", isAuthenticated, authorize("corporate"), getMyProblems);
+
+//before '/:id' to be matched correctly
+router.get("/tags", getAllTags);
+router.get("/industries", getAllIndustries);
 
 router.get("/:id", getProblemById);
 

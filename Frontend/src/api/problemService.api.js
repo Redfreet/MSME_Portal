@@ -3,11 +3,11 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const config = {
-  withCredentials: true, //for protected route
+  withCredentials: true,
 };
 
-const getAllProblems = () => {
-  return axios.get(`${API_URL}/problems`, config);
+const getAllProblems = (params = {}) => {
+  return axios.get(`${API_URL}/problems`, { ...config, params });
 };
 
 const getProblemById = (id) => {
@@ -42,6 +42,14 @@ const updateProblemStatus = (problemId, status) => {
   );
 };
 
+const getAllIndustries = () => {
+  return axios.get(`${API_URL}/problems/industries`, config);
+};
+
+const getAllTags = () => {
+  return axios.get(`${API_URL}/problems/tags`, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -50,6 +58,8 @@ const problemService = {
   createProblem,
   upvoteSolution,
   updateProblemStatus,
+  getAllIndustries,
+  getAllTags,
 };
 
 export default problemService;

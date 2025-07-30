@@ -1,5 +1,6 @@
 import Problem from "../models/problem.model.js";
 import Activity from "../models/activity.model.js";
+import User from "../models/user.model.js";
 
 export const createProblem = async (req, res) => {
   const { title, description, skills_needed, tags } = req.body;
@@ -40,21 +41,42 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
   try {
-    const allProblems = await Problem.find()
-      .populate("companyId", "fullName industry")
-      .sort({ createdAt: -1 })
-      .lean();
+    const { search, industry } = req.query;
 
-    const openProblems = allProblems.filter(
-      (p) => p && p.status && p.status === "Open"
-    );
+    //Build the database query object
+    const query = {};
+
+    // If an industry is specified, we first find the users in that industry
+    if (industry) {
+      const corporateUsers = await User.find({
+        role: "corporate",
+        industry: industry,
+      }).select("_id");
+      const userIds = corporateUsers.map((user) => user._id);
+      // Then we add a condition to the problem query to only include problems from those users
+      query.companyId = { $in: userIds };
+    }
+
+    // If a search term is provided, add regex for case-insensitive search
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const allProblems = await Problem.find(query)
+      .populate("companyId", "fullName industry")
+      .sort({ createdAt: -1 });
+
+    const openProblems = allProblems.filter((p) => p.status === "Open");
     const closedProblems = allProblems.filter(
-      (p) => p && p.status && p.status === "Closed"
+      (p) => p.status === "Closed" || p.status
     );
 
     res.status(200).json({ openProblems, closedProblems });
   } catch (error) {
-    console.error(error.message);
+    console.error("Error in getAllProblems controller:", error);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -122,6 +144,30 @@ export const updateProblemStatus = async (req, res) => {
     res.status(200).json(problem);
   } catch (error) {
     console.error("Error updating problem status:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getAllTags = async (req, res) => {
+  try {
+    const tags = await Problem.distinct("tags");
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error("Error fetching tags:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getAllIndustries = async (req, res) => {
+  try {
+    //distinct() method to find all unique values
+    const industries = await User.distinct("industry", {
+      role: "corporate",
+      industry: { $ne: null, $ne: "" }, // Ensure we don't get null or empty strings
+    });
+    res.status(200).json(industries);
+  } catch (error) {
+    console.error("Error fetching industries:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };
