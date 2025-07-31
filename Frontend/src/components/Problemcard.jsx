@@ -4,8 +4,8 @@ const ProblemCard = ({ problem, isClosed = false }) => {
   const { _id, title, description, tags, companyId } = problem;
 
   const cardClasses = `
-    bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all ${
-      isClosed ? "opacity-70 bg-gray-50 hover:scale-100" : "hover:scale-105"
+    bg-white rounded-lg shadow-sm p-5 border border-gray-200 hover:shadow-lg transition-all ${
+      isClosed ? "opacity-70 bg-gray-50 hover:scale-100" : "hover:scale-100"
     }`;
 
   return (
@@ -37,7 +37,7 @@ const ProblemCard = ({ problem, isClosed = false }) => {
 
       <Link
         to={`/problem/${_id}`}
-        className="inline-block font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-md transition-colors"
+        className="border border-gray-700 hover:border-green-600 hover:text-green-600 uppercase px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50 text-base"
       >
         View Details
       </Link>

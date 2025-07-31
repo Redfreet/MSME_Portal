@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContent";
 import authService from "../api/authService.js";
+import msmeLogo from "../img/msme.png";
 
 const Navbar = () => {
   const { authUser, setAuthUser, loading } = useAuth();
@@ -19,8 +20,8 @@ const Navbar = () => {
   return (
     <nav className="bg-[#E0E0E0] text-[#333333] font-mono font-bold p-4 mb-8 shadow-md">
       <div className="container h-5 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold hover:text-[#121212]">
-          MSME Portal
+        <Link to="/" className="flex items-center">
+          <img src={msmeLogo} alt="MSME Portal" className="h-16" />
         </Link>
         <div className="flex items-center gap-3 text-lg">
           {/* Conditional rendering based on auth state */}
@@ -31,7 +32,7 @@ const Navbar = () => {
             <>
               <Link
                 to="/profile"
-                className="font-semibold hover:text-blue-400 transition-colors"
+                className="font-semibold hover:text-[#121212] transition-colors"
               >
                 Welcome, {authUser.fullName.split(" ")[0]}!
               </Link>

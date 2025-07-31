@@ -121,9 +121,9 @@ const ProblemDetailPage = () => {
             <button
               onClick={handleCloseProblem}
               disabled={isUpdatingStatus}
-              className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-700 disabled:bg-red-300"
+              className=" uppercase border border-gray-700 hover:border-red-800 hover:text-red-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50 text-base disabled:bg-red-300"
             >
-              {isUpdatingStatus ? "Closing..." : "Close Problem"}
+              {isUpdatingStatus ? "Closing..." : "Close"}
             </button>
           )}
           {/* Show a badge if the problem is closed */}
@@ -143,13 +143,13 @@ const ProblemDetailPage = () => {
             </span>
           ))}
         </div>
-        <div className="prose max-w-none mt-6">
-          <p>{problem.description}</p>
-        </div>
+        <pre className="whitespace-pre-wrap text-gray-800 mb-4">
+          {problem.description}
+        </pre>
       </div>
 
       <div className="bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+        <h2 className="flex justify-center text-3xl font-bold text-gray-900 mb-6">
           Solutions & Discussion
         </h2>
         <div className="space-y-6">
@@ -174,7 +174,6 @@ const ProblemDetailPage = () => {
       {/* Disable solution form if problem is not open */}
       {authUser && problem.status === "Open" && (
         <div className="mt-8">
-          <h3 className="text-2xl font-bold mb-4">Submit a Solution</h3>
           <SolutionForm problemId={id} onSolutionSubmit={handleNewSolution} />
         </div>
       )}

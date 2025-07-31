@@ -61,7 +61,7 @@ const HomePage = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-8">
+    <div className="font-mono flex flex-col md:flex-row gap-8">
       {/* --- Sidebar for Industry Filtering --- */}
       <aside className="w-full md:w-1/4 lg:w-1/5">
         <div className="bg-white p-4 rounded-lg shadow-md sticky top-24">
