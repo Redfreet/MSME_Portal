@@ -55,12 +55,24 @@ const SolutionComment = ({
     (authUser._id === solution.collaboratorId?._id ||
       authUser.role === "admin");
 
+  const profilePicSrc =
+    solution.collaboratorId?.profile?.profilePhoto ||
+    `https://placehold.co/100x100/EFEFEF/AAAAAA?text=${solution.collaboratorId?.fullName.charAt(
+      0
+    )}`;
+
   return (
     <div className="flex">
       {/* Vertical line for nesting */}
       <div className="mr-4 flex flex-col items-center">
-        <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0"></div>
-        <div className="w-px h-full bg-gray-300"></div>
+        <img
+          src={profilePicSrc}
+          alt={solution.collaboratorId?.fullName}
+          className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 object-cover"
+        />
+        {hasReplies && isExpanded && (
+          <div className="w-px h-full bg-gray-300"></div>
+        )}
       </div>
 
       {/* Comment Content */}

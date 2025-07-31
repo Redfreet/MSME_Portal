@@ -9,7 +9,9 @@ const triggerNaradaSummary = async (problemId, parentSolutionId) => {
 
     const naradaUser = await User.findOne({ username: "narada" });
     if (!naradaUser) {
-      console.error("Narada AI user not found in the database.");
+      console.error(
+        "Narada AI user not found in the database. Make sure the username is 'narada'."
+      );
       return;
     }
 
@@ -22,19 +24,15 @@ const triggerNaradaSummary = async (problemId, parentSolutionId) => {
       return;
     }
 
-    // Filter out any previous summaries from Narada to avoid a feedback loop
-    const userDiscussion = allSolutions.filter(
-      (s) => s.collaboratorId.username !== "narada"
-    );
+    const userDiscussion = allSolutions
+      .filter((s) => s.collaboratorId && s.collaboratorId.username !== "narada") // Ensure collaborator exists
+      .map((s) => `@${s.collaboratorId.username}: ${s.content}`);
 
-    const discussionContext = userDiscussion
-      .map((s) => `@${s.collaboratorId.username}: ${s.content}`)
-      .join("\n");
+    const discussionContext = userDiscussion.join("\n");
 
-    // --- THIS PROMPT IS NOW MORE SPECIFIC ---
     const prompt = `As an AI assistant named Narada, provide a brief, neutral summary of the following discussion between users. Your summary must only describe the interactions between the human users and must not mention yourself or the fact that you are providing a summary. Do not add any introductory or concluding remarks, just the summary itself.\n\n---\n\n${discussionContext}`;
 
-    const apiKey = process.env.geminiAi;
+    const apiKey = process.env.GEMINIAI;
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     const payload = {
@@ -123,7 +121,7 @@ export const submitSolution = async (req, res) => {
 
     savedSolution = await savedSolution.populate(
       "collaboratorId",
-      "fullName username"
+      "fullName username profile.profilePhoto"
     );
     res.status(201).json(savedSolution);
   } catch (error) {
@@ -142,7 +140,7 @@ export const getSolutionsForProblem = async (req, res) => {
     }
 
     const allSolutions = await Solution.find({ problemId })
-      .populate("collaboratorId", "fullName username")
+      .populate("collaboratorId", "fullName username profile.profilePhoto")
       .sort({ createdAt: "asc" });
 
     const solutionMap = {};
@@ -194,7 +192,7 @@ export const toggleUpvoteSolution = async (req, res) => {
 
     const populatedSolution = await solution.populate(
       "collaboratorId",
-      "fullName username"
+      "fullName username profile.profilePhoto"
     );
 
     res.status(200).json(populatedSolution);
