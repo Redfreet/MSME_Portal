@@ -4,8 +4,10 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./utils/db.js";
 import userRoutes from "./routes/user.route.js";
 import cors from "cors";
+
 import problemRoutes from "./routes/problem.route.js";
 import solutionRoutes from "./routes/solution.route.js";
+import industryRoutes from "./routes/industry.route.js";
 
 dotenv.config();
 
@@ -25,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/solutions", solutionRoutes);
+app.use("/api/industries", industryRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is listening at port ${PORT}`);

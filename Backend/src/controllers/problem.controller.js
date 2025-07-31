@@ -1,6 +1,7 @@
 import Problem from "../models/problem.model.js";
 import Activity from "../models/activity.model.js";
 import User from "../models/user.model.js";
+import Industry from "../models/industry.model.js";
 
 export const createProblem = async (req, res) => {
   const { title, description, skills_needed, tags } = req.body;
@@ -42,22 +43,25 @@ export const createProblem = async (req, res) => {
 export const getAllProblems = async (req, res) => {
   try {
     const { search, industry } = req.query;
-
-    //Build the database query object
     const query = {};
 
-    // If an industry is specified, we first find the users in that industry
     if (industry) {
-      const corporateUsers = await User.find({
-        role: "corporate",
-        industry: industry,
-      }).select("_id");
-      const userIds = corporateUsers.map((user) => user._id);
-      // Then we add a condition to the problem query to only include problems from those users
-      query.companyId = { $in: userIds };
+      const industryDoc = await Industry.findOne({
+        name: { $regex: `^${industry}$`, $options: "i" },
+      });
+
+      if (industryDoc) {
+        const corporateUsers = await User.find({
+          role: "corporate",
+          industry: industryDoc._id,
+        }).select("_id");
+        const userIds = corporateUsers.map((user) => user._id);
+        query.companyId = { $in: userIds };
+      } else {
+        query.companyId = { $in: [] };
+      }
     }
 
-    // If a search term is provided, add regex for case-insensitive search
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -69,9 +73,11 @@ export const getAllProblems = async (req, res) => {
       .populate("companyId", "fullName industry")
       .sort({ createdAt: -1 });
 
-    const openProblems = allProblems.filter((p) => p.status === "Open");
+    const openProblems = allProblems.filter(
+      (p) => p.status === "Open" || p.status === "In Progress"
+    );
     const closedProblems = allProblems.filter(
-      (p) => p.status === "Closed" || p.status
+      (p) => p.status === "Closed" || p.status === "Solved"
     );
 
     res.status(200).json({ openProblems, closedProblems });
@@ -154,20 +160,6 @@ export const getAllTags = async (req, res) => {
     res.status(200).json(tags);
   } catch (error) {
     console.error("Error fetching tags:", error.message);
-    res.status(500).send("Internal Server Error");
-  }
-};
-
-export const getAllIndustries = async (req, res) => {
-  try {
-    //distinct() method to find all unique values
-    const industries = await User.distinct("industry", {
-      role: "corporate",
-      industry: { $ne: null, $ne: "" }, // Ensure we don't get null or empty strings
-    });
-    res.status(200).json(industries);
-  } catch (error) {
-    console.error("Error fetching industries:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };

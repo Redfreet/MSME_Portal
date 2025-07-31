@@ -12,6 +12,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      unique: true,
+      trim: true,
+      minlength: 3,
+    },
     password: {
       type: String,
       required: true,
@@ -19,7 +26,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["collaborator", "corporate"],
+      enum: ["collaborator", "corporate", "admin"],
       required: true,
     },
     profile: {
@@ -30,7 +37,7 @@ const userSchema = new mongoose.Schema(
         default: "",
       },
     },
-    industry: { type: String },
+    industry: { type: mongoose.Schema.Types.ObjectId, ref: "Industry" },
     website: { type: String },
   },
   { timestamps: true }

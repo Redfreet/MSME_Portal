@@ -1,22 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../api/authService";
+import industryService from "../api/industryService.api";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    username: "",
     password: "",
     role: "collaborator",
+    industry: "",
   });
 
-  // State for loading and error messages
+  const [industries, setIndustries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  // Handle input changes and update state
+  useEffect(() => {
+    const fetchIndustries = async () => {
+      try {
+        const response = await industryService.getAllIndustries();
+        setIndustries(response.data || []);
+      } catch (err) {
+        console.error("Failed to fetch industries:", err);
+        setError("Could not load industry list. Please try again later.");
+      }
+    };
+    fetchIndustries();
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,7 +39,6 @@ const SignupPage = () => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -64,6 +78,25 @@ const SignupPage = () => {
               required
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               value={formData.fullName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              required
+              minLength="3"
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              value={formData.username}
               onChange={handleChange}
             />
           </div>
@@ -132,6 +165,34 @@ const SignupPage = () => {
               </label>
             </div>
           </div>
+
+          {formData.role === "corporate" && (
+            <div>
+              <label
+                htmlFor="industry"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Industry
+              </label>
+              <select
+                name="industry"
+                id="industry"
+                required={formData.role === "corporate"}
+                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                value={formData.industry}
+                onChange={handleChange}
+              >
+                <option value="" disabled>
+                  Select your industry...
+                </option>
+                {industries.map((industry) => (
+                  <option key={industry._id} value={industry._id}>
+                    {industry.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {error && <p className="text-sm text-red-600 text-center">{error}</p>}
 

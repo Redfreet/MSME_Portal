@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContent";
 import authService from "../api/authService";
+import industryService from "../api/industryService.api";
 
 const EditProfilePage = () => {
   const { authUser, setAuthUser } = useAuth();
   const navigate = useNavigate();
 
-  // Initialize form state with the authenticated user's data
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -15,19 +15,31 @@ const EditProfilePage = () => {
     industry: "",
     website: "",
   });
-
+  const [industries, setIndustries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  //populate the form with the user's current data
+  useEffect(() => {
+    const fetchIndustries = async () => {
+      try {
+        const response = await industryService.getAllIndustries();
+        setIndustries(response.data || []);
+      } catch (err) {
+        console.error("Failed to fetch industries:", err);
+        setError("Could not load the list of industries.");
+      }
+    };
+    fetchIndustries();
+  }, []);
+
   useEffect(() => {
     if (authUser) {
       setFormData({
         fullName: authUser.fullName || "",
         email: authUser.email || "",
         bio: authUser.profile?.bio || "",
-        industry: authUser.industry || "",
+        industry: authUser.industry?._id || "",
         website: authUser.website || "",
       });
     }
@@ -133,14 +145,22 @@ const EditProfilePage = () => {
                 >
                   Industry
                 </label>
-                <input
-                  type="text"
+                <select
                   name="industry"
                   id="industry"
                   value={formData.industry}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                >
+                  <option value="" disabled>
+                    Select your industry...
+                  </option>
+                  {industries.map((industry) => (
+                    <option key={industry._id} value={industry._id}>
+                      {industry.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label

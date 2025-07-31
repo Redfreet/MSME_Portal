@@ -2,16 +2,41 @@ import { generateToken } from "../utils/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import Activity from "../models/activity.model.js";
+import Industry from "../models/industry.model.js";
 
 export const signup = async (req, res) => {
   // console.log("Request body received:", req.body);
-  const { fullName, email, password, role, profile, industry, website } =
-    req.body;
+  const {
+    fullName,
+    email,
+    password,
+    role,
+    profile,
+    industry,
+    website,
+    username,
+  } = req.body;
   try {
-    if (!fullName || !email || !password || !role) {
+    if (!fullName || !username || !email || !password || !role) {
       return res
         .status(400)
         .json({ message: "All fields are required!", success: false });
+    }
+
+    if (role === "corporate" && !industry) {
+      return res.status(400).json({
+        message: "Industry is required for corporate accounts.",
+        success: false,
+      });
+    }
+
+    if (role === "corporate") {
+      const industryExists = await Industry.findById(industry);
+      if (!industryExists) {
+        return res
+          .status(400)
+          .json({ message: "Invalid industry selected.", success: false });
+      }
     }
 
     if (password.length < 6) {
@@ -21,17 +46,27 @@ export const signup = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
-    if (user)
-      return res
-        .status(400)
-        .json({ message: "Email already exists", success: false });
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({
+          message: "An account with this email already exists.",
+          success: false,
+        });
+      }
+      if (existingUser.username === username) {
+        return res
+          .status(400)
+          .json({ message: "This username is already taken.", success: false });
+      }
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       fullName,
+      username,
       email,
       password: hashedPassword,
       role,
@@ -51,8 +86,10 @@ export const signup = async (req, res) => {
       res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
+        username: newUser.username,
         email: newUser.email,
         role: newUser.role,
+        industry: newUser.industry,
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -100,8 +137,12 @@ export const login = async (req, res) => {
       .json({
         _id: user._id,
         fullName: user.fullName,
+        username: user.username,
         email: user.email,
         role: user.role,
+        industry: user.industry,
+        website: user.website,
+        profile: user.profile,
       });
   } catch (error) {
     console.log("Error in login controller", error);
@@ -155,10 +196,12 @@ export const updateUserProfile = async (req, res) => {
       }
 
       const updatedUser = await user.save();
+      await updatedUser.populate("industry", "name");
 
       res.status(200).json({
         _id: updatedUser._id,
         fullName: updatedUser.fullName,
+        username: updatedUser.username,
         email: updatedUser.email,
         role: updatedUser.role,
         profile: updatedUser.profile,

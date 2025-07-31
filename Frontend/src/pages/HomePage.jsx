@@ -79,15 +79,16 @@ const HomePage = () => {
             </li>
             {industries.map((industry) => (
               <li
-                key={industry}
-                onClick={() => setSelectedIndustry(industry)}
+                key={industry._id} // Use the unique _id for the key
+                onClick={() => setSelectedIndustry(industry.name)} // Filter by the industry name
                 className={`p-2 mt-1 rounded-md cursor-pointer capitalize ${
-                  selectedIndustry === industry
+                  selectedIndustry === industry.name
                     ? "bg-blue-500 text-white"
                     : "hover:bg-gray-100"
                 }`}
               >
-                {industry}
+                {industry.name}{" "}
+                {/* Render the industry name, not the whole object */}
               </li>
             ))}
           </ul>

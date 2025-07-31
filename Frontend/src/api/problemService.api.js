@@ -43,7 +43,7 @@ const updateProblemStatus = (problemId, status) => {
 };
 
 const getAllIndustries = () => {
-  return axios.get(`${API_URL}/problems/industries`, config);
+  return axios.get(`${API_URL}/industries`, config);
 };
 
 const getAllTags = () => {

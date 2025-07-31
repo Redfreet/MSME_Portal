@@ -12,7 +12,9 @@ export const isAuthenticated = async (req, res, next) => {
     }
 
     const decoded = await jwt.verify(token, process.env.SECRET_KEY);
-    req.user = await User.findById(decoded.userId).select("-password");
+    req.user = await User.findById(decoded.userId)
+      .select("-password")
+      .populate("industry", "name");
 
     if (!req.user) {
       return res

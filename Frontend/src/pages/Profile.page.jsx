@@ -64,7 +64,7 @@ const ProfilePage = () => {
                     Industry
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {authUser.industry || "Not specified"}
+                    {authUser.industry.name || "Not specified"}
                   </dd>
                 </div>
                 <div className="sm:col-span-1">

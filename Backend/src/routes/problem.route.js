@@ -6,7 +6,6 @@ import {
   getMyProblems,
   updateProblemStatus,
   getAllTags,
-  getAllIndustries,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
@@ -20,7 +19,6 @@ router.get("/my", isAuthenticated, authorize("corporate"), getMyProblems);
 
 //before '/:id' to be matched correctly
 router.get("/tags", getAllTags);
-router.get("/industries", getAllIndustries);
 
 router.get("/:id", getProblemById);
 
