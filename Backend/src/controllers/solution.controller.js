@@ -1,6 +1,76 @@
 import Solution from "../models/solution.model.js";
 import Problem from "../models/problem.model.js";
 import Activity from "../models/activity.model.js";
+import User from "../models/user.model.js";
+
+const triggerNaradaSummary = async (problemId, parentSolutionId) => {
+  try {
+    console.log("Narada mention detected. Triggering AI summary...");
+
+    const naradaUser = await User.findOne({ username: "narada" });
+    if (!naradaUser) {
+      console.error("Narada AI user not found in the database.");
+      return;
+    }
+
+    const allSolutions = await Solution.find({ problemId }).populate(
+      "collaboratorId",
+      "username"
+    );
+
+    if (allSolutions.length <= 1) {
+      return;
+    }
+
+    // Filter out any previous summaries from Narada to avoid a feedback loop
+    const userDiscussion = allSolutions.filter(
+      (s) => s.collaboratorId.username !== "narada"
+    );
+
+    const discussionContext = userDiscussion
+      .map((s) => `@${s.collaboratorId.username}: ${s.content}`)
+      .join("\n");
+
+    // --- THIS PROMPT IS NOW MORE SPECIFIC ---
+    const prompt = `As an AI assistant named Narada, provide a brief, neutral summary of the following discussion between users. Your summary must only describe the interactions between the human users and must not mention yourself or the fact that you are providing a summary. Do not add any introductory or concluding remarks, just the summary itself.\n\n---\n\n${discussionContext}`;
+
+    const apiKey = process.env.geminiAi;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+    const payload = {
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(
+        `API call failed with status: ${response.status}. Body: ${errorBody}`
+      );
+    }
+
+    const result = await response.json();
+    const summaryText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (summaryText) {
+      const naradaReply = new Solution({
+        content: summaryText,
+        problemId: problemId,
+        collaboratorId: naradaUser._id,
+        parentSolution: parentSolutionId,
+      });
+      await naradaReply.save();
+      console.log("Narada has posted a summary.");
+    }
+  } catch (error) {
+    console.error("Error in triggerNaradaSummary:", error.message);
+  }
+};
 
 export const submitSolution = async (req, res) => {
   const { problemId } = req.params;
@@ -35,6 +105,10 @@ export const submitSolution = async (req, res) => {
     });
 
     let savedSolution = await newSolution.save();
+
+    if (content.toLowerCase().includes("@narada")) {
+      triggerNaradaSummary(problemId, savedSolution._id);
+    }
 
     const activity = new Activity({
       userId: req.user.id,

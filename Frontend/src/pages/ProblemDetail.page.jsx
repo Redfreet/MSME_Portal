@@ -13,6 +13,7 @@ const ProblemDetailPage = () => {
   const [error, setError] = useState("");
   const { authUser } = useAuth();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isNaradaThinking, setIsNaradaThinking] = useState(false);
 
   const fetchSolutions = async () => {
     try {
@@ -45,8 +46,24 @@ const ProblemDetailPage = () => {
     fetchData();
   }, [id]);
 
-  const handleNewSolution = () => {
+  const handleNewSolution = (newSolution) => {
     fetchSolutions();
+
+    if (newSolution && newSolution.content) {
+      const isNaradaMentioned = newSolution.content
+        .toLowerCase()
+        .includes("@narada");
+
+      if (isNaradaMentioned) {
+        setIsNaradaThinking(true);
+        console.log("Narada mentioned. Waiting for AI summary...");
+
+        setTimeout(() => {
+          fetchSolutions();
+          setIsNaradaThinking(false);
+        }, 5000);
+      }
+    }
   };
 
   //FUNCTION TO HANDLE UPVOTING
@@ -152,6 +169,15 @@ const ProblemDetailPage = () => {
         <h2 className="flex justify-center text-3xl font-bold text-gray-900 mb-6">
           Solutions & Discussion
         </h2>
+        {isNaradaThinking && (
+          <div
+            className="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg"
+            role="alert"
+          >
+            <span className="font-medium">Narada is thinking...</span> A summary
+            of the discussion will appear shortly.
+          </div>
+        )}
         <div className="space-y-6">
           {solutions.length > 0 ? (
             solutions.map((solution) => (
@@ -159,8 +185,8 @@ const ProblemDetailPage = () => {
                 key={solution._id}
                 solution={solution}
                 problemId={id}
-                onReplySubmit={fetchSolutions} // Pass refetch function
-                onUpvote={handleUpvote} // Pass the upvote handler down
+                onReplySubmit={handleNewSolution}
+                onUpvote={handleUpvote}
               />
             ))
           ) : (
