@@ -17,37 +17,38 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-800 text-white p-4 mb-8 shadow-md">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold hover:text-blue-400">
+    <nav className="bg-[#E0E0E0] text-[#333333] font-mono font-bold p-4 mb-8 shadow-md">
+      <div className="container h-5 flex justify-between items-center">
+        <Link to="/" className="text-2xl font-bold hover:text-[#121212]">
           MSME Portal
         </Link>
-        <div className="flex items-center gap-6 text-lg">
+        <div className="flex items-center gap-3 text-lg">
           {/* Conditional rendering based on auth state */}
           {loading ? (
             <span>Loading...</span>
           ) : authUser ? (
             // If user is logged in
             <>
-              {/* Show 'Post a Problem' link only for corporate users */}
-              {authUser.role === "corporate" && (
-                <Link
-                  to="/create-problem"
-                  className="hover:text-blue-400 transition-colors"
-                >
-                  Post a Problem
-                </Link>
-              )}
-
               <Link
                 to="/profile"
                 className="font-semibold hover:text-blue-400 transition-colors"
               >
-                Welcome, {authUser.fullName}!
+                Welcome, {authUser.fullName.split(" ")[0]}!
               </Link>
+
+              {/* Show 'Post a Problem' link only for corporate users */}
+              {authUser.role === "corporate" && (
+                <Link
+                  to="/create-problem"
+                  className="border border-gray-700 hover:border-green-600 hover:text-green-600 uppercase px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50 text-base"
+                >
+                  Post
+                </Link>
+              )}
+
               <button
                 onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition-colors"
+                className=" uppercase border border-gray-700 hover:border-red-800 hover:text-red-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50 text-base"
               >
                 Logout
               </button>
@@ -57,13 +58,13 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="hover:text-blue-400 transition-colors"
+                className="border border-gray-700 hover:border-green-600 hover:text-green-600 uppercase px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50 text-base"
               >
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="hover:text-blue-400 transition-colors"
+                className="border border-gray-700 hover:border-green-600 hover:text-green-600 uppercase px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50 text-base"
               >
                 Sign Up
               </Link>
