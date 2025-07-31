@@ -32,6 +32,16 @@ const updateProfile = (profileData) => {
   return axios.put(`${API_URL}/user/profile`, profileData, config);
 };
 
+const updateProfilePicture = (formData) => {
+  const uploadConfig = {
+    ...config,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+  return axios.put(`${API_URL}/user/profile/picture`, formData, uploadConfig);
+};
+
 const authService = {
   signup,
   login,
@@ -39,6 +49,7 @@ const authService = {
   getMe,
   getActivity,
   updateProfile,
+  updateProfilePicture,
 };
 
 export default authService;

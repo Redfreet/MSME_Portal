@@ -226,3 +226,29 @@ export const updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const updateProfilePicture = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided." });
+    }
+
+    const profilePhotoUrl = req.file.path;
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    user.profile.profilePhoto = profilePhotoUrl;
+    await user.save();
+
+    await user.populate("industry", "name");
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error in updateProfilePicture controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
