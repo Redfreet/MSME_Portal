@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "./SolutionForm";
 import problemService from "../api/problemService.api.js";
@@ -6,8 +6,17 @@ import problemService from "../api/problemService.api.js";
 const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
   const { authUser } = useAuth();
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const isUpvoted = authUser && solution.upvotes?.includes(authUser._id);
+  const hasReplies = solution.replies && solution.replies.length > 0;
+
+  const toggleReplies = () => {
+    if (hasReplies) {
+      // Only toggle if there are replies
+      setIsExpanded(!isExpanded);
+    }
+  };
 
   const handleReplySuccess = () => {
     setShowReplyForm(false);
@@ -46,7 +55,10 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
 
       {/* Comment Content */}
       <div className="flex-1">
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div
+          className="bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+          onClick={toggleReplies} // Click to toggle replies
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center text-sm">
               <p className="font-bold text-gray-800">
@@ -62,7 +74,10 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
               </p>
             </div>
             <button
-              onClick={() => onUpvote(solution._id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpvote(solution._id);
+              }}
               className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs transition-colors ${
                 isUpvoted
                   ? "bg-blue-500 text-white"
@@ -77,7 +92,10 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
           <p className="text-gray-700 mt-2">{solution.content}</p>
           <div className="mt-4 flex items-center gap-4">
             <button
-              onClick={() => setShowReplyForm(!showReplyForm)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowReplyForm(!showReplyForm);
+              }}
               className="text-xs font-semibold text-blue-600 hover:underline"
             >
               Reply
@@ -86,12 +104,24 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
               <>
                 <span className="text-gray-300">•</span>
                 <button
-                  onClick={handleDelete}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete();
+                  }}
                   className="text-xs font-semibold text-red-600 hover:underline"
                 >
                   Delete
                 </button>
               </>
+            )}
+            {hasReplies && (
+              <span
+                className={`ml-auto text-gray-600 text-xl transition-transform duration-200 ${
+                  isExpanded ? "rotate-90" : ""
+                }`}
+              >
+                &#9658;
+              </span>
             )}
           </div>
         </div>
@@ -109,9 +139,10 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
         )}
 
         {/* If this solution has replies, render them using this same component */}
-        {solution.replies && solution.replies.length > 0 && (
-          <div className="mt-4 space-y-4">
+        {hasReplies && (
+          <div className={`mt-4 space-y-4 ${isExpanded ? "" : "hidden"}`}>
             {solution.replies.map((reply) => (
+              // Recursively render nested SolutionComments for each reply
               <SolutionComment
                 key={reply._id}
                 solution={reply}
