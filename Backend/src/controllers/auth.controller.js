@@ -23,6 +23,13 @@ export const signup = async (req, res) => {
         .json({ message: "All fields are required!", success: false });
     }
 
+    if (/\s/.test(username)) {
+      return res.status(400).json({
+        message: "Username cannot contain spaces.",
+        success: false,
+      });
+    }
+
     if (role === "corporate" && !industry) {
       return res.status(400).json({
         message: "Industry is required for corporate accounts.",
@@ -140,6 +147,7 @@ export const login = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        companyName: user.companyName,
         industry: user.industry,
         website: user.website,
         profile: user.profile,
@@ -193,6 +201,7 @@ export const updateUserProfile = async (req, res) => {
       if (user.role === "corporate") {
         user.industry = req.body.industry || user.industry;
         user.website = req.body.website || user.website;
+        user.companyName = req.body.companyName;
       }
 
       const updatedUser = await user.save();
@@ -204,6 +213,7 @@ export const updateUserProfile = async (req, res) => {
         username: updatedUser.username,
         email: updatedUser.email,
         role: updatedUser.role,
+        companyName: updatedUser.companyName,
         profile: updatedUser.profile,
         industry: updatedUser.industry,
         website: updatedUser.website,

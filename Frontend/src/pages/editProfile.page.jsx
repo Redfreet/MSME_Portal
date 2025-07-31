@@ -14,6 +14,7 @@ const EditProfilePage = () => {
     bio: "",
     industry: "",
     website: "",
+    companyName: "",
   });
   const [industries, setIndustries] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -41,6 +42,7 @@ const EditProfilePage = () => {
         bio: authUser.profile?.bio || "",
         industry: authUser.industry?._id || "",
         website: authUser.website || "",
+        companyName: authUser.companyName || "",
       });
     }
   }, [authUser]);
@@ -138,6 +140,23 @@ const EditProfilePage = () => {
           )}
           {authUser.role === "corporate" && (
             <>
+              <div>
+                <label
+                  htmlFor="companyName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Company Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="companyName"
+                  id="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                />
+              </div>
+
               <div>
                 <label
                   htmlFor="industry"

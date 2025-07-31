@@ -70,7 +70,7 @@ export const getAllProblems = async (req, res) => {
     }
 
     const allProblems = await Problem.find(query)
-      .populate("companyId", "fullName industry")
+      .populate("companyId", "fullName industry companyName")
       .sort({ createdAt: -1 });
 
     const openProblems = allProblems.filter(
@@ -91,7 +91,7 @@ export const getProblemById = async (req, res) => {
   try {
     const problem = await Problem.findById(req.params.id).populate(
       "companyId",
-      "fullName industry website"
+      "fullName industry website companyName"
     );
 
     if (!problem) {
@@ -110,9 +110,11 @@ export const getProblemById = async (req, res) => {
 
 export const getMyProblems = async (req, res) => {
   try {
-    const problems = await Problem.find({ companyId: req.user.id }).sort({
-      createdAt: -1,
-    });
+    const problems = await Problem.find({ companyId: req.user.id })
+      .populate("companyId", "fullName industry companyName")
+      .sort({
+        createdAt: -1,
+      });
     res.json(problems);
   } catch (err) {
     console.error(err.message);

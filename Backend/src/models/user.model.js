@@ -12,12 +12,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    companyName: {
+      type: String,
+      trim: true,
+    },
     username: {
       type: String,
       required: [true, "Username is required"],
       unique: true,
       trim: true,
       minlength: 3,
+      match: [/^[^\s]+$/, "Username cannot contain spaces"],
     },
     password: {
       type: String,

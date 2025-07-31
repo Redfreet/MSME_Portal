@@ -51,6 +51,12 @@ const ProfilePage = () => {
         <div className="border-t border-gray-200 pt-6">
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-8">
             <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Username</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                @{authUser.username}
+              </dd>
+            </div>
+            <div className="sm:col-span-1">
               <dt className="text-sm font-medium text-gray-500">
                 Email address
               </dt>
@@ -59,6 +65,15 @@ const ProfilePage = () => {
 
             {authUser.role === "corporate" && (
               <>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Company Name
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {authUser.companyName || "Not specified"}
+                  </dd>
+                </div>
+
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">
                     Industry

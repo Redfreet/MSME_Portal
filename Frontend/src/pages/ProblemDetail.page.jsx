@@ -35,15 +35,7 @@ const ProblemDetailPage = () => {
 
   //update on submitting new sol
   const handleNewSolution = (newSolution) => {
-    const populatedSolution = {
-      ...newSolution,
-      collaboratorId: {
-        _id: authUser._id,
-        fullName: authUser.fullName,
-      },
-      upvotes: [],
-    };
-    setSolutions([populatedSolution, ...solutions]);
+    setSolutions([newSolution, ...solutions]);
   };
 
   //FUNCTION TO HANDLE UPVOTING
@@ -108,7 +100,9 @@ const ProblemDetailPage = () => {
         <div className="flex justify-between items-start">
           <div>
             <p className="text-sm text-gray-500 font-semibold">
-              {problem.companyId?.fullName}
+              {problem.companyId?.companyName
+                ? `${problem.companyId.companyName} (${problem.companyId.fullName})`
+                : problem.companyId?.fullName || "A Company"}
             </p>
             <h1 className="text-4xl font-bold text-gray-900 mt-2">
               {problem.title}
@@ -165,6 +159,9 @@ const ProblemDetailPage = () => {
                     <div className="flex items-center">
                       <p className="font-bold text-gray-800">
                         {solution.collaboratorId?.fullName}
+                        <span className="text-sm text-gray-500 font-normal ml-2">
+                          @{solution.collaboratorId?.username}
+                        </span>
                       </p>
                       <span className="text-xs text-gray-500 mx-2">•</span>
                       <p className="text-xs text-gray-500">

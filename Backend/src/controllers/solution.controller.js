@@ -24,19 +24,23 @@ export const submitSolution = async (req, res) => {
       collaboratorId: req.user.id,
     });
 
-    const savedSolution = await newSolution.save();
+    let savedSolution = await newSolution.save();
 
     //new activity document after the solution is saved.
     const activity = new Activity({
       userId: req.user.id,
       type: "SUBMITTED_SOLUTION",
       title: `You submitted a solution for: "${problem.title}"`,
-      entityId: problem._id, //to go to prblm link from activity
+      entityId: problem._id,
       entityModel: "Problem",
-      focusId: savedSolution._id, //the specific solution to scroll
+      focusId: savedSolution._id,
     });
     await activity.save();
 
+    savedSolution = await savedSolution.populate(
+      "collaboratorId",
+      "fullName username"
+    );
     res.status(201).json(savedSolution);
   } catch (error) {
     console.error("Error submitting solution:", error);
@@ -54,7 +58,7 @@ export const getSolutionsForProblem = async (req, res) => {
     }
 
     const solutions = await Solution.find({ problemId })
-      .populate("collaboratorId", "fullName email profile.skills")
+      .populate("collaboratorId", "fullName email username profile.skills")
       .sort({ createdAt: "desc" });
 
     res.status(200).json(solutions);
@@ -73,7 +77,6 @@ export const toggleUpvoteSolution = async (req, res) => {
 
     const userId = req.user._id;
 
-    // Check if the user has already upvoted this solution
     const upvoteIndex = solution.upvotes.indexOf(userId);
 
     if (upvoteIndex === -1) {
@@ -83,7 +86,13 @@ export const toggleUpvoteSolution = async (req, res) => {
     }
 
     await solution.save();
-    res.status(200).json(solution);
+
+    const populatedSolution = await solution.populate(
+      "collaboratorId",
+      "fullName username"
+    );
+
+    res.status(200).json(populatedSolution);
   } catch (error) {
     console.error("Error in toggleUpvoteSolution controller:", error.message);
     res.status(500).json({ message: "Internal Server Error" });

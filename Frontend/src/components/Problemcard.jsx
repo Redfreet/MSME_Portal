@@ -12,7 +12,9 @@ const ProblemCard = ({ problem, isClosed = false }) => {
     <div className={cardClasses}>
       <div className="mb-4">
         <p className="text-sm text-gray-500 font-semibold">
-          {companyId?.fullName || "A Company"}
+          {companyId?.companyName
+            ? `${companyId.companyName} (${companyId.fullName})`
+            : companyId?.fullName || "A Company"}
         </p>
         <h2 className="text-2xl font-bold text-gray-800 mt-1">{title}</h2>
       </div>
