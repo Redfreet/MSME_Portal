@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "./SolutionForm";
 import problemService from "../api/problemService.api.js";
 
-const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
+const SolutionComment = ({
+  solution,
+  problemId,
+  onUpvote,
+  onReplySubmit,
+  initialExpanded = false,
+}) => {
   const { authUser } = useAuth();
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
+
+  useEffect(() => {
+    setIsExpanded(initialExpanded);
+  }, [initialExpanded]);
 
   const isUpvoted = authUser && solution.upvotes?.includes(authUser._id);
   const hasReplies = solution.replies && solution.replies.length > 0;
@@ -149,6 +159,7 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
                 problemId={problemId}
                 onUpvote={onUpvote}
                 onReplySubmit={onReplySubmit}
+                initialExpanded={isExpanded}
               />
             ))}
           </div>
