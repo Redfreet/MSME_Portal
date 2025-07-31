@@ -3,6 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import problemService from "../api/problemService.api.js";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "../components/SolutionForm";
+import SolutionComment from "../components/SolutionComment";
 
 const ProblemDetailPage = () => {
   const { id } = useParams();
@@ -13,9 +14,20 @@ const ProblemDetailPage = () => {
   const { authUser } = useAuth();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
+  const fetchSolutions = async () => {
+    try {
+      const solutionsRes = await problemService.getSolutionsForProblem(id);
+      setSolutions(solutionsRes.data);
+    } catch (err) {
+      console.error("Failed to refetch solutions:", err);
+      setError("Could not update the solution list.");
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [problemRes, solutionsRes] = await Promise.all([
           problemService.getProblemById(id),
           problemService.getSolutionsForProblem(id),
@@ -33,9 +45,8 @@ const ProblemDetailPage = () => {
     fetchData();
   }, [id]);
 
-  //update on submitting new sol
-  const handleNewSolution = (newSolution) => {
-    setSolutions([newSolution, ...solutions]);
+  const handleNewSolution = () => {
+    fetchSolutions();
   };
 
   //FUNCTION TO HANDLE UPVOTING
@@ -45,12 +56,8 @@ const ProblemDetailPage = () => {
       return;
     }
     try {
-      const response = await problemService.upvoteSolution(solutionId);
-      const updatedSolution = response.data;
-
-      setSolutions(
-        solutions.map((s) => (s._id === solutionId ? updatedSolution : s))
-      );
+      await problemService.upvoteSolution(solutionId);
+      fetchSolutions();
     } catch (err) {
       console.error("Failed to upvote solution:", err);
       alert("There was an error processing your vote.");
@@ -147,44 +154,15 @@ const ProblemDetailPage = () => {
         </h2>
         <div className="space-y-6">
           {solutions.length > 0 ? (
-            solutions.map((solution) => {
-              const isUpvoted =
-                authUser && solution.upvotes.includes(authUser._id);
-              return (
-                <div
-                  key={solution._id}
-                  className="border-b border-gray-200 pb-4"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <p className="font-bold text-gray-800">
-                        {solution.collaboratorId?.fullName}
-                        <span className="text-sm text-gray-500 font-normal ml-2">
-                          @{solution.collaboratorId?.username}
-                        </span>
-                      </p>
-                      <span className="text-xs text-gray-500 mx-2">•</span>
-                      <p className="text-xs text-gray-500">
-                        {new Date(solution.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleUpvote(solution._id)}
-                      className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                        isUpvoted
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                      disabled={!authUser}
-                    >
-                      <span>👍</span>
-                      <span>{solution.upvotes.length}</span>
-                    </button>
-                  </div>
-                  <p className="text-gray-700">{solution.content}</p>
-                </div>
-              );
-            })
+            solutions.map((solution) => (
+              <SolutionComment
+                key={solution._id}
+                solution={solution}
+                problemId={id}
+                onReplySubmit={fetchSolutions} // Pass refetch function
+                onUpvote={handleUpvote} // Pass the upvote handler down
+              />
+            ))
           ) : (
             <p className="text-gray-500">
               No solutions have been submitted yet. Be the first to comment!
@@ -195,7 +173,10 @@ const ProblemDetailPage = () => {
 
       {/* Disable solution form if problem is not open */}
       {authUser && problem.status === "Open" && (
-        <SolutionForm problemId={id} onSolutionSubmit={handleNewSolution} />
+        <div className="mt-8">
+          <h3 className="text-2xl font-bold mb-4">Submit a Solution</h3>
+          <SolutionForm problemId={id} onSolutionSubmit={handleNewSolution} />
+        </div>
       )}
     </div>
   );

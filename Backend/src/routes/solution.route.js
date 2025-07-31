@@ -12,7 +12,7 @@ import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 router.post(
   "/problem/:problemId",
   isAuthenticated,
-  authorize("collaborator", "corporate"),
+  authorize("collaborator", "corporate", "admin"),
   submitSolution
 );
 
@@ -21,7 +21,7 @@ router.get("/problem/:problemId", getSolutionsForProblem);
 router.put(
   "/:id/upvote",
   isAuthenticated,
-  authorize("collaborator", "corporate"),
+  authorize("collaborator", "corporate", "admin"),
   toggleUpvoteSolution
 );
 

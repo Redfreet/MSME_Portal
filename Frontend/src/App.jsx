@@ -42,18 +42,21 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/problem/:id" element={<ProblemDetailPage />} />
 
-            <Route element={<ProtectedRoute allowedRoles={["corporate"]} />}>
+            <Route
+              element={<ProtectedRoute allowedRoles={["corporate", "admin"]} />}
+            >
               <Route path="/create-problem" element={<CreateProblemPage />} />
             </Route>
 
             <Route
               element={
-                <ProtectedRoute allowedRoles={["corporate", "collaborator"]} />
+                <ProtectedRoute
+                  allowedRoles={["corporate", "collaborator", "admin"]}
+                />
               }
             >
-              {/*profile route */}
               <Route path="/profile" element={<ProfilePage />} />
-              {/* 2. Add the new route for editing the profile here */}
+
               <Route path="/profile/edit" element={<EditProfilePage />} />
             </Route>
           </Routes>

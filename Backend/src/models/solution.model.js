@@ -16,6 +16,12 @@ const solutionSchema = new mongoose.Schema(
       type: String,
       required: [true, "Solution content is required"],
     },
+    parentSolution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Solution",
+      default: null,
+      index: true,
+    },
     status: {
       type: String,
       enum: ["Submitted", "Under Review", "Accepted", "Rejected"],

@@ -4,7 +4,9 @@ import Activity from "../models/activity.model.js";
 
 export const submitSolution = async (req, res) => {
   const { problemId } = req.params;
-  const { content } = req.body;
+  const { content, parentSolution } = req.body;
+
+  console.log("Submitting solution. Request body:", req.body);
 
   if (!content) {
     return res
@@ -18,15 +20,22 @@ export const submitSolution = async (req, res) => {
       return res.status(404).json({ message: "Problem not found" });
     }
 
+    if (parentSolution) {
+      const parent = await Solution.findById(parentSolution);
+      if (!parent) {
+        return res.status(404).json({ message: "Parent comment not found" });
+      }
+    }
+
     const newSolution = new Solution({
       content,
       problemId,
       collaboratorId: req.user.id,
+      parentSolution: parentSolution || null,
     });
 
     let savedSolution = await newSolution.save();
 
-    //new activity document after the solution is saved.
     const activity = new Activity({
       userId: req.user.id,
       type: "SUBMITTED_SOLUTION",
@@ -35,6 +44,7 @@ export const submitSolution = async (req, res) => {
       entityModel: "Problem",
       focusId: savedSolution._id,
     });
+
     await activity.save();
 
     savedSolution = await savedSolution.populate(
@@ -57,11 +67,32 @@ export const getSolutionsForProblem = async (req, res) => {
       return res.status(404).json({ message: "Problem not found." });
     }
 
-    const solutions = await Solution.find({ problemId })
-      .populate("collaboratorId", "fullName email username profile.skills")
-      .sort({ createdAt: "desc" });
+    const allSolutions = await Solution.find({ problemId })
+      .populate("collaboratorId", "fullName username")
+      .sort({ createdAt: "asc" });
 
-    res.status(200).json(solutions);
+    const solutionMap = {};
+    const rootSolutions = [];
+
+    allSolutions.forEach((solution) => {
+      solution = solution.toObject();
+      solution.replies = [];
+      solutionMap[solution._id] = solution;
+    });
+
+    //link replies to their parents
+    allSolutions.forEach((solution) => {
+      if (solution.parentSolution) {
+        const parent = solutionMap[solution.parentSolution];
+        if (parent) {
+          parent.replies.push(solutionMap[solution._id]);
+        }
+      } else {
+        rootSolutions.push(solutionMap[solution._id]);
+      }
+    });
+    const sortedRootSolutions = rootSolutions.reverse();
+    res.status(200).json(sortedRootSolutions);
   } catch (error) {
     console.error("Error getting solutions:", error);
     res.status(500).json({ message: "Server Error" });
