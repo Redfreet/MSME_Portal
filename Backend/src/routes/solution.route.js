@@ -5,6 +5,7 @@ import {
   submitSolution,
   getSolutionsForProblem,
   toggleUpvoteSolution,
+  deleteSolution,
 } from "../controllers/solution.controller.js";
 
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
@@ -23,6 +24,13 @@ router.put(
   isAuthenticated,
   authorize("collaborator", "corporate", "admin"),
   toggleUpvoteSolution
+);
+
+router.delete(
+  "/:id",
+  isAuthenticated,
+  authorize("collaborator", "corporate", "admin"),
+  deleteSolution
 );
 
 export default router;

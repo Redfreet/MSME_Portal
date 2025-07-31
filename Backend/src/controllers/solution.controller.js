@@ -129,3 +129,40 @@ export const toggleUpvoteSolution = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const deleteSolution = async (req, res) => {
+  try {
+    const solution = await Solution.findById(req.params.id);
+
+    if (!solution) {
+      return res.status(404).json({ message: "Solution not found" });
+    }
+
+    if (
+      solution.collaboratorId.toString() !== req.user.id.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(403)
+        .json({ message: "User not authorized to delete this solution" });
+    }
+
+    const deleteReplies = async (solutionId) => {
+      const replies = await Solution.find({ parentSolution: solutionId });
+      for (const reply of replies) {
+        await deleteReplies(reply._id);
+      }
+      await Solution.findByIdAndDelete(solutionId);
+      await Activity.deleteMany({ focusId: solutionId });
+    };
+
+    await deleteReplies(req.params.id);
+
+    res
+      .status(200)
+      .json({ message: "Solution and all replies deleted successfully" });
+  } catch (error) {
+    console.error("Error in deleteSolution controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

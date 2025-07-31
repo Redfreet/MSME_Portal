@@ -50,6 +50,10 @@ const getAllTags = () => {
   return axios.get(`${API_URL}/problems/tags`, config);
 };
 
+const deleteSolution = (solutionId) => {
+  return axios.delete(`${API_URL}/solutions/${solutionId}`, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -60,6 +64,7 @@ const problemService = {
   updateProblemStatus,
   getAllIndustries,
   getAllTags,
+  deleteSolution,
 };
 
 export default problemService;

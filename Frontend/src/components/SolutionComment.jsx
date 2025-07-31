@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "./SolutionForm";
+import problemService from "../api/problemService.api.js";
 
 const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
   const { authUser } = useAuth();
@@ -12,6 +13,29 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
     setShowReplyForm(false);
     onReplySubmit();
   };
+
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this comment and all its replies?"
+      )
+    ) {
+      return;
+    }
+    try {
+      await problemService.deleteSolution(solution._id);
+      onReplySubmit(); // Refetch all comments to update the UI
+    } catch (err) {
+      console.error("Failed to delete solution:", err);
+      alert("There was an error deleting this comment.");
+    }
+  };
+
+  const canDelete =
+    authUser &&
+    (authUser._id === solution.collaboratorId?._id ||
+      authUser.role === "admin");
+
   return (
     <div className="flex">
       {/* Vertical line for nesting */}
@@ -51,13 +75,24 @@ const SolutionComment = ({ solution, problemId, onUpvote, onReplySubmit }) => {
             </button>
           </div>
           <p className="text-gray-700 mt-2">{solution.content}</p>
-          <div className="mt-4">
+          <div className="mt-4 flex items-center gap-4">
             <button
               onClick={() => setShowReplyForm(!showReplyForm)}
-              className="text-sm font-semibold text-blue-600 hover:underline"
+              className="text-xs font-semibold text-blue-600 hover:underline"
             >
               Reply
             </button>
+            {canDelete && (
+              <>
+                <span className="text-gray-300">•</span>
+                <button
+                  onClick={handleDelete}
+                  className="text-xs font-semibold text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         </div>
 
