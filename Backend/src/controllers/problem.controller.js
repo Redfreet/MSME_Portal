@@ -178,3 +178,39 @@ export const getAllTags = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+export const updateProblem = async (req, res) => {
+  try {
+    const problem = await Problem.findById(req.params.id);
+
+    if (!problem) {
+      return res.status(404).json({ message: "Problem not found" });
+    }
+
+    if (problem.companyId.toString() !== req.user.id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "User not authorized to update this problem" });
+    }
+
+    const { title, description, skills_needed, tags, urgency, region } =
+      req.body;
+
+    problem.title = title || problem.title;
+    problem.description = description || problem.description;
+    problem.skills_needed = skills_needed || problem.skills_needed;
+    problem.tags = tags || problem.tags;
+    problem.urgency = urgency || problem.urgency;
+    problem.region = region || problem.region;
+
+    if (req.file) {
+      problem.attachmentUrl = req.file.path;
+    }
+
+    const updatedProblem = await problem.save();
+    res.status(200).json(updatedProblem);
+  } catch (error) {
+    console.error("Error in updateProblem controller:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};

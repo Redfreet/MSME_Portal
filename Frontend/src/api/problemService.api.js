@@ -60,6 +60,20 @@ const deleteSolution = (solutionId) => {
   return axios.delete(`${API_URL}/solutions/${solutionId}`, config);
 };
 
+const updateProblem = (problemId, problemData) => {
+  const uploadConfig = {
+    ...config,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+  return axios.put(
+    `${API_URL}/problems/${problemId}`,
+    problemData,
+    uploadConfig
+  );
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -71,6 +85,7 @@ const problemService = {
   getAllIndustries,
   getAllTags,
   deleteSolution,
+  updateProblem,
 };
 
 export default problemService;

@@ -10,6 +10,7 @@ import {
   getMyProblems,
   updateProblemStatus,
   getAllTags,
+  updateProblem,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
@@ -38,6 +39,14 @@ router.put(
   isAuthenticated,
   authorize("corporate"),
   updateProblemStatus
+);
+
+router.put(
+  "/:id",
+  isAuthenticated,
+  authorize("corporate"),
+  upload.single("attachment"),
+  updateProblem
 );
 
 export default router;
