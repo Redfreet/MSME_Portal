@@ -16,9 +16,9 @@ import { isAuthenticated } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 router.use((req, res, next) => {
-  console.log(
-    `[USER ROUTER] Received request: ${req.method} ${req.originalUrl}`
-  );
+  // console.log(
+  //   `[USER ROUTER] Received request: ${req.method} ${req.originalUrl}`
+  // );
   next();
 });
 
@@ -38,9 +38,9 @@ export default router;
 router.put(
   "/profile/picture",
   (req, res, next) => {
-    console.log(
-      "[PROFILE PICTURE ROUTE] Reached the picture upload route. Attempting to process file..."
-    );
+    // console.log(
+    //   "[PROFILE PICTURE ROUTE] Reached the picture upload route. Attempting to process file..."
+    // );
     next();
   },
   isAuthenticated,

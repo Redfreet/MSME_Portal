@@ -4,12 +4,12 @@ import User from "../models/user.model.js";
 import Industry from "../models/industry.model.js";
 
 export const createProblem = async (req, res) => {
-  const { title, description, skills_needed, tags } = req.body;
+  const { title, description, skills_needed, tags, urgency, region } = req.body;
 
-  if (!title || !description) {
+  if (!title || !description || !urgency) {
     return res
       .status(400)
-      .json({ message: "Please provide a title and description" });
+      .json({ message: "Please provide a title, description and urgency" });
   }
 
   try {
@@ -19,6 +19,8 @@ export const createProblem = async (req, res) => {
       skills_needed: skills_needed || [],
       tags: tags || [],
       companyId: req.user.id,
+      urgency,
+      region: region || "",
     });
 
     if (req.file) {
@@ -46,7 +48,7 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
   try {
-    const { search, industry } = req.query;
+    const { search, industry, urgency, region } = req.query;
     const query = {};
 
     if (industry) {
@@ -64,6 +66,13 @@ export const getAllProblems = async (req, res) => {
       } else {
         query.companyId = { $in: [] };
       }
+    }
+
+    if (urgency) {
+      query.urgency = urgency;
+    }
+    if (region) {
+      query.region = { $regex: region, $options: "i" };
     }
 
     if (search) {

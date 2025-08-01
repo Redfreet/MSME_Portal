@@ -7,6 +7,8 @@ const CreateProblemPage = () => {
     title: "",
     description: "",
     tags: "",
+    urgency: "Low",
+    region: "",
   });
   const [attachment, setAttachment] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -36,12 +38,14 @@ const CreateProblemPage = () => {
       const problemFormData = new FormData();
       problemFormData.append("title", formData.title);
       problemFormData.append("description", formData.description);
+      problemFormData.append("urgency", formData.urgency);
+      problemFormData.append("region", formData.region);
 
       const tagsArray = formData.tags
         .split(",")
         .map((tag) => tag.trim())
         .filter((tag) => tag);
-      problemFormData.append("tags", tagsArray);
+      tagsArray.forEach((tag) => problemFormData.append("tags", tag));
 
       if (attachment) {
         problemFormData.append("attachment", attachment);
@@ -125,6 +129,45 @@ const CreateProblemPage = () => {
                 />
               </div>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="urgency"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Urgency
+              </label>
+              <select
+                name="urgency"
+                id="urgency"
+                value={formData.urgency}
+                onChange={handleChange}
+                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="region"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Region (Optional)
+              </label>
+              <input
+                type="text"
+                name="region"
+                id="region"
+                placeholder="e.g., Delhi, Jharkhand"
+                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md"
+                value={formData.region}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
           <div>

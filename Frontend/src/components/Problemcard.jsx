@@ -1,15 +1,35 @@
 import { Link } from "react-router-dom";
 
 const ProblemCard = ({ problem, isClosed = false }) => {
-  const { _id, title, description, tags, companyId } = problem;
+  const { _id, title, description, tags, companyId, urgency, region } = problem;
 
   const cardClasses = `
     bg-white rounded-lg shadow-sm p-5 border border-gray-200 hover:shadow-lg transition-all ${
       isClosed ? "opacity-70 bg-gray-50 hover:scale-100" : "hover:scale-100"
     }`;
 
+  let urgencyColor = "bg-green-100 text-green-800";
+  if (urgency === "High") {
+    urgencyColor = "bg-red-100 text-red-800";
+  } else if (urgency === "Medium") {
+    urgencyColor = "bg-yellow-100 text-yellow-800";
+  }
+
   return (
     <div className={cardClasses}>
+      <div className="flex flex-wrap gap-2 mb-3">
+        <span
+          className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${urgencyColor}`}
+        >
+          {urgency}
+        </span>
+        {region && (
+          <span className="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+            {region}
+          </span>
+        )}
+      </div>
+
       <div className="mb-4">
         <p className="text-sm text-gray-500 font-semibold">
           {companyId?.companyName

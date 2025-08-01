@@ -8,10 +8,11 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // State for filters
   const [industries, setIndustries] = useState([]);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUrgency, setSelectedUrgency] = useState(null);
+  const [selectedRegion, setSelectedRegion] = useState("");
 
   useEffect(() => {
     const fetchIndustries = async () => {
@@ -25,7 +26,6 @@ const HomePage = () => {
     fetchIndustries();
   }, []);
 
-  // Effect to fetch problems whenever a filter changes
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       const fetchProblems = async () => {
@@ -37,6 +37,12 @@ const HomePage = () => {
           }
           if (searchTerm) {
             params.search = searchTerm;
+          }
+          if (selectedUrgency) {
+            params.urgency = selectedUrgency;
+          }
+          if (selectedRegion) {
+            params.region = selectedRegion;
           }
 
           const response = await problemService.getAllProblems(params);
@@ -51,10 +57,17 @@ const HomePage = () => {
         }
       };
       fetchProblems();
-    }, 300); // 300ms delay to prevent API calls on every keystroke
+    }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [selectedIndustry, searchTerm]);
+  }, [selectedIndustry, searchTerm, selectedUrgency, selectedRegion]);
+
+  const handleClearFilters = () => {
+    setSelectedIndustry(null);
+    setSelectedUrgency(null);
+    setSelectedRegion("");
+    setSearchTerm("");
+  };
 
   if (error) {
     return <p className="text-center text-red-500 mt-8">{error}</p>;
@@ -64,38 +77,80 @@ const HomePage = () => {
     <div className="font-mono flex flex-col md:flex-row gap-8">
       {/* --- Sidebar for Industry Filtering --- */}
       <aside className="w-full md:w-1/4 lg:w-1/5">
-        <div className="bg-white p-4 rounded-lg shadow-md sticky top-24">
-          <h2 className="text-lg font-bold mb-4 border-b pb-2">Industries</h2>
-          <ul>
-            <li
-              onClick={() => setSelectedIndustry(null)}
-              className={`p-2 rounded-md cursor-pointer ${
-                !selectedIndustry
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              All Industries
-            </li>
-            {industries.map((industry) => (
+        <div className="bg-white p-4 rounded-lg shadow-md sticky top-24 space-y-6">
+          {/* Industry Filter */}
+          <div>
+            <h2 className="text-lg font-bold mb-2 border-b pb-2">Industries</h2>
+            <ul>
               <li
-                key={industry._id} // Use the unique _id for the key
-                onClick={() => setSelectedIndustry(industry.name)} // Filter by the industry name
-                className={`p-2 mt-1 rounded-md cursor-pointer capitalize ${
-                  selectedIndustry === industry.name
+                onClick={() => setSelectedIndustry(null)}
+                className={`p-2 rounded-md cursor-pointer ${
+                  !selectedIndustry
                     ? "bg-blue-500 text-white"
                     : "hover:bg-gray-100"
                 }`}
               >
-                {industry.name}{" "}
-                {/* Render the industry name, not the whole object */}
+                All Industries
               </li>
-            ))}
-          </ul>
+              {industries.map((industry) => (
+                <li
+                  key={industry._id}
+                  onClick={() => setSelectedIndustry(industry.name)}
+                  className={`p-2 mt-1 rounded-md cursor-pointer capitalize ${
+                    selectedIndustry === industry.name
+                      ? "bg-blue-500 text-white"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {industry.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Urgency Filter */}
+          <div>
+            <h2 className="text-lg font-bold mb-2 border-b pb-2">Urgency</h2>
+            <ul>
+              {["High", "Medium", "Low"].map((level) => (
+                <li
+                  key={level}
+                  onClick={() => setSelectedUrgency(level)}
+                  className={`p-2 mt-1 rounded-md cursor-pointer ${
+                    selectedUrgency === level
+                      ? "bg-blue-500 text-white"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {level}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Region Filter */}
+          <div>
+            <h2 className="text-lg font-bold mb-2 border-b pb-2">Region</h2>
+            <input
+              type="text"
+              placeholder="Filter by region..."
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div>
+            <button
+              onClick={handleClearFilters}
+              className="w-full p-2 mt-4 text-sm text-center text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+            >
+              Clear All Filters
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* --- Main Content: Search and Problem List --- */}
       <main className="w-full md:w-3/4 lg:w-4/5">
         {/* Search Bar */}
         <div className="relative mb-8">

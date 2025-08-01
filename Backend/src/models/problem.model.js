@@ -19,6 +19,16 @@ const problemSchema = new mongoose.Schema(
     attachmentUrl: {
       type: String,
     },
+    urgency: {
+      type: String,
+      required: [true, "Urgency level is required"],
+      enum: ["High", "Medium", "Low"],
+      default: "Low",
+    },
+    region: {
+      type: String,
+      trim: true,
+    },
     skills_needed: {
       type: [String],
       default: [],
