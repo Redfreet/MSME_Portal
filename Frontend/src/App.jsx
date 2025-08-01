@@ -15,6 +15,7 @@ import EditProfilePage from "./pages/editProfile.page";
 import EditProblemPage from "./pages/editProblem.page";
 import AdminPage from "./pages/admin.page";
 import EditAdminPage from "./pages/editAdmin.page.jsx";
+import DashboardPage from "./pages/dashboard.page.jsx";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -69,7 +70,7 @@ function App() {
               }
             >
               <Route path="/profile" element={<ProfilePage />} />
-
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/profile/edit" element={<EditProfilePage />} />
             </Route>
           </Routes>

@@ -10,7 +10,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await authService.logout();
-      setAuthUser(null); // Clear the user from global state
+      setAuthUser(null);
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -37,7 +37,13 @@ const Navbar = () => {
                 Welcome, {authUser.fullName.split(" ")[0]}!
               </Link>
 
-              {/* Show 'Post a Problem' link only for corporate users */}
+              <Link
+                to="/dashboard"
+                className="uppercase border border-gray-700 hover:border-purple-800 hover:text-purple-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 text-base"
+              >
+                Dashboard
+              </Link>
+
               {authUser.role === "corporate" && (
                 <Link
                   to="/create-problem"
@@ -64,7 +70,6 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            // If user is logged out
             <>
               <Link
                 to="/login"

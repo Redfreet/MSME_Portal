@@ -302,3 +302,79 @@ export const updateProblemAdmin = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
+export const getDashboardData = async (req, res) => {
+  try {
+    const mostActiveProblems = await Solution.aggregate([
+      { $group: { _id: "$problemId", commentCount: { $sum: 1 } } },
+      { $sort: { commentCount: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "problems",
+          localField: "_id",
+          foreignField: "_id",
+          as: "problemDetails",
+        },
+      },
+      {
+        $unwind: "$problemDetails",
+      },
+      {
+        $project: {
+          _id: 1,
+          commentCount: 1,
+          title: "$problemDetails.title",
+        },
+      },
+    ]);
+
+    const mostPopularSolutions = await Solution.aggregate([
+      { $addFields: { upvoteCount: { $size: "$upvotes" } } },
+      { $sort: { upvoteCount: -1 } },
+      { $limit: 5 },
+      {
+        $project: {
+          _id: 1,
+          content: 1,
+          upvoteCount: 1,
+          problemId: 1,
+        },
+      },
+    ]);
+
+    const problemsByIndustry = await Problem.aggregate([
+      { $match: { status: "Open" } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "companyId",
+          foreignField: "_id",
+          as: "company",
+        },
+      },
+      { $unwind: "$company" },
+      {
+        $lookup: {
+          from: "industries",
+          localField: "company.industry",
+          foreignField: "_id",
+          as: "industryDetails",
+        },
+      },
+      { $unwind: "$industryDetails" },
+      { $group: { _id: "$industryDetails.name", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $project: { name: "$_id", count: 1, _id: 0 } },
+    ]);
+
+    res.status(200).json({
+      mostActiveProblems,
+      mostPopularSolutions,
+      problemsByIndustry,
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

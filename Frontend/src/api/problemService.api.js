@@ -117,6 +117,10 @@ const updateSolutionAdmin = (solutionId, solutionData) => {
   );
 };
 
+const getDashboardData = () => {
+  return axios.get(`${API_URL}/problems/dashboard`, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -135,6 +139,7 @@ const problemService = {
   deleteCommentAdmin,
   updateProblemAdmin,
   updateSolutionAdmin,
+  getDashboardData,
 };
 
 export default problemService;
