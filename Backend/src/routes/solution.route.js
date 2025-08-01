@@ -8,6 +8,7 @@ import {
   deleteSolution,
   deleteCommentFromSolution,
   getSolutionsAdmin,
+  updateSolutionAdmin,
 } from "../controllers/solution.controller.js";
 
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
@@ -47,6 +48,13 @@ router.get(
   isAuthenticated,
   authorize("admin"),
   getSolutionsAdmin
+);
+
+router.put(
+  "/admin/:id",
+  isAuthenticated,
+  authorize("admin"),
+  updateSolutionAdmin
 );
 
 export default router;

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Solution from "../models/solution.model.js";
 import Problem from "../models/problem.model.js";
 import Activity from "../models/activity.model.js";
@@ -283,6 +284,36 @@ export const deleteCommentFromSolution = async (req, res) => {
     res.status(200).json({ message: "Comment deleted successfully." });
   } catch (error) {
     console.error("Error deleting embedded comment:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateSolutionAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+
+    if (!content) {
+      return res.status(400).json({ message: "Content cannot be empty." });
+    }
+
+    const solution = await Solution.findById(id);
+
+    if (!solution) {
+      return res.status(404).json({ message: "Solution not found." });
+    }
+
+    solution.content = content;
+    await solution.save();
+
+    const populatedSolution = await solution.populate(
+      "collaboratorId",
+      "username fullName"
+    );
+
+    res.status(200).json(populatedSolution);
+  } catch (error) {
+    console.error("Error updating solution (Admin):", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

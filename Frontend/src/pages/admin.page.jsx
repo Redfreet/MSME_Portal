@@ -8,7 +8,8 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedProblemId, setExpandedProblemId] = useState(null);
-  const [editingProblem, setEditingProblem] = useState(null);
+  const [editingSolutionId, setEditingSolutionId] = useState(null);
+  const [editingSolutionText, setEditingSolutionText] = useState("");
 
   const fetchAllProblems = async () => {
     try {
@@ -79,6 +80,63 @@ const AdminPage = () => {
     }
   };
 
+  const handleDeleteSolution = async (problemId, solutionId) => {
+    if (window.confirm("Are you sure you want to delete this solution?")) {
+      try {
+        await problemService.deleteSolution(solutionId);
+        const updatedProblems = problems.map((p) => {
+          if (p._id === problemId) {
+            const filteredSolutions = p.solutions.filter(
+              (s) => s._id !== solutionId
+            );
+            return { ...p, solutions: filteredSolutions };
+          }
+          return p;
+        });
+        setProblems(updatedProblems);
+      } catch (err) {
+        console.error("Failed to delete solution:", err);
+        alert("Failed to delete the solution. Please try again.");
+      }
+    }
+  };
+
+  const handleEditSolution = (solution) => {
+    setEditingSolutionId(solution._id);
+    setEditingSolutionText(solution.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSolutionId(null);
+    setEditingSolutionText("");
+  };
+
+  const handleUpdateSolution = async () => {
+    if (!editingSolutionId) return;
+
+    try {
+      const response = await problemService.updateSolutionAdmin(
+        editingSolutionId,
+        { content: editingSolutionText }
+      );
+
+      const updatedProblems = problems.map((p) => {
+        if (p._id === expandedProblemId) {
+          const updatedSolutions = p.solutions.map((s) =>
+            s._id === editingSolutionId ? response.data : s
+          );
+          return { ...p, solutions: updatedSolutions };
+        }
+        return p;
+      });
+      setProblems(updatedProblems);
+      handleCancelEdit();
+    } catch (err) {
+      console.error("Failed to update solution:", err);
+      alert("Failed to update solution.");
+    }
+  };
+
   const toggleSolutionsView = async (problemId) => {
     if (expandedProblemId === problemId) {
       setExpandedProblemId(null);
@@ -116,35 +174,19 @@ const AdminPage = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Title
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Company
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Urgency
                 </th>
-
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -203,7 +245,7 @@ const AdminPage = () => {
                       </button>
                     </td>
                   </tr>
-                  {/* Expanded row for solutions */}
+                  {/* Expanded Solutions Row */}
                   {expandedProblemId === problem._id && problem.solutions && (
                     <tr>
                       <td colSpan="5" className="bg-gray-100 p-4">
@@ -217,36 +259,72 @@ const AdminPage = () => {
                                 key={solution._id}
                                 className="p-3 bg-white rounded-md shadow-sm"
                               >
-                                <p className="text-sm text-gray-700">
-                                  {solution.description}
-                                </p>
-                                {solution.comments &&
-                                  solution.comments.length > 0 && (
-                                    <div className="mt-2 pl-4 border-l-2 border-gray-200">
-                                      <h5 className="font-semibold text-gray-600">
-                                        Comments:
-                                      </h5>
-                                      {solution.comments.map((comment) => (
-                                        <div
-                                          key={comment._id}
-                                          className="flex justify-between items-center text-sm text-gray-500 mt-1"
-                                        >
-                                          <span>{comment.text}</span>
-                                          <button
-                                            onClick={() =>
-                                              handleDeleteComment(
-                                                solution._id,
-                                                comment._id
-                                              )
-                                            }
-                                            className="text-red-500 hover:text-red-700"
-                                          >
-                                            <FaTrashAlt />
-                                          </button>
-                                        </div>
-                                      ))}
+                                <div className="flex items-center justify-between mb-2">
+                                  <div>
+                                    <span className="font-bold text-sm text-gray-900">
+                                      {solution.collaboratorId?.fullName}
+                                    </span>
+                                    <span className="text-xs text-gray-500 ml-2">
+                                      @{solution.collaboratorId?.username}
+                                    </span>
+                                  </div>
+                                  {/* Conditionally render Edit/Delete or Save/Cancel */}
+                                  {editingSolutionId !== solution._id && (
+                                    <div className="flex items-center space-x-3">
+                                      <button
+                                        onClick={() =>
+                                          handleEditSolution(solution)
+                                        }
+                                        className="text-blue-600 hover:text-blue-900 text-xs font-semibold"
+                                      >
+                                        <FaEdit />
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteSolution(
+                                            problem._id,
+                                            solution._id
+                                          )
+                                        }
+                                        className="text-red-600 hover:text-red-900 text-xs font-semibold"
+                                      >
+                                        <FaTrashAlt />
+                                      </button>
                                     </div>
                                   )}
+                                </div>
+
+                                {/* Conditionally render text or textarea */}
+                                {editingSolutionId === solution._id ? (
+                                  <div>
+                                    <textarea
+                                      value={editingSolutionText}
+                                      onChange={(e) =>
+                                        setEditingSolutionText(e.target.value)
+                                      }
+                                      className="w-full p-2 border border-gray-300 rounded-md"
+                                      rows="4"
+                                    />
+                                    <div className="flex justify-end gap-2 mt-2">
+                                      <button
+                                        onClick={handleCancelEdit}
+                                        className="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm"
+                                      >
+                                        Cancel
+                                      </button>
+                                      <button
+                                        onClick={handleUpdateSolution}
+                                        className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                                      >
+                                        Save
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-gray-700">
+                                    {solution.content}
+                                  </p>
+                                )}
                               </li>
                             ))}
                           </ul>
@@ -264,52 +342,6 @@ const AdminPage = () => {
           </table>
         </div>
       </div>
-
-      {editingProblem && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <h3 className="text-2xl font-bold mb-4">
-              Edit Problem: {editingProblem.title}
-            </h3>
-            <form onSubmit={handleUpdateProblem}>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Status
-                </label>
-                <select
-                  value={editingProblem.status}
-                  onChange={(e) =>
-                    setEditingProblem({
-                      ...editingProblem,
-                      status: e.target.value,
-                    })
-                  }
-                  className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                >
-                  <option value="Open">Open</option>
-
-                  <option value="Closed">Closed</option>
-                </select>
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setEditingProblem(null)}
-                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

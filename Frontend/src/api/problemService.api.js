@@ -98,13 +98,21 @@ const updateProblemAdmin = (problemId, problemData) => {
 };
 
 const getSolutionsAdmin = (problemId) => {
-  return axios.get(`${API_URL}/solutions/admin/problems/${problemId}`, config);
+  return axios.get(`${API_URL}/solutions/admin/solutions/${problemId}`, config);
 };
 
 const deleteCommentAdmin = (solutionId, commentId) => {
   return axios.put(
     `${API_URL}/solutions/admin/solutions/${solutionId}/comments/${commentId}`,
     {},
+    config
+  );
+};
+
+const updateSolutionAdmin = (solutionId, solutionData) => {
+  return axios.put(
+    `${API_URL}/solutions/admin/${solutionId}`,
+    solutionData,
     config
   );
 };
@@ -126,6 +134,7 @@ const problemService = {
   getSolutionsAdmin,
   deleteCommentAdmin,
   updateProblemAdmin,
+  updateSolutionAdmin,
 };
 
 export default problemService;
