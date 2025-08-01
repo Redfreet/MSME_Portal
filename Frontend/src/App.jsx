@@ -12,7 +12,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateProblemPage from "./pages/CreateProblem.page";
 import ProfilePage from "./pages/Profile.page";
 import EditProfilePage from "./pages/editProfile.page";
-import EditProblemPage from "./pages/editProblem.page.jsx";
+import EditProblemPage from "./pages/editProblem.page";
+import AdminPage from "./pages/admin.page";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -48,6 +49,10 @@ function App() {
             >
               <Route path="/create-problem" element={<CreateProblemPage />} />
               <Route path="/problem/:id/edit" element={<EditProblemPage />} />
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+              <Route path="/admin" element={<AdminPage />} />
             </Route>
 
             <Route

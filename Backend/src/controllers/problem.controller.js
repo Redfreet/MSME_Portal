@@ -2,6 +2,7 @@ import Problem from "../models/problem.model.js";
 import Activity from "../models/activity.model.js";
 import User from "../models/user.model.js";
 import Industry from "../models/industry.model.js";
+import Solution from "../models/solution.model.js";
 
 export const createProblem = async (req, res) => {
   const { title, description, skills_needed, tags, urgency, region } = req.body;
@@ -211,6 +212,50 @@ export const updateProblem = async (req, res) => {
     res.status(200).json(updatedProblem);
   } catch (error) {
     console.error("Error in updateProblem controller:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getAllProblemsAdmin = async (req, res) => {
+  try {
+    const problems = await Problem.find({})
+      .populate("companyId", "fullName companyName")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(problems);
+  } catch (error) {
+    console.error("Error in getAllProblemsAdmin controller:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const deleteProblemAdmin = async (req, res) => {
+  try {
+    const problem = await Problem.findById(req.params.id);
+
+    if (!problem) {
+      return res.status(404).json({ message: "Problem not found" });
+    }
+
+    //Delete all solutions associated with this problem
+    await Solution.deleteMany({ problemId: req.params.id });
+
+    //Delete all activities associated with this problem
+    await Activity.deleteMany({
+      entityId: req.params.id,
+      entityModel: "Problem",
+    });
+
+    //Delete the problem itself
+    await problem.deleteOne();
+
+    res
+      .status(200)
+      .json({
+        message: "Problem and all associated data deleted successfully.",
+      });
+  } catch (error) {
+    console.error("Error in deleteProblemAdmin controller:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };

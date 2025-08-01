@@ -11,6 +11,7 @@ import {
   updateProblemStatus,
   getAllTags,
   updateProblem,
+  getAllProblemsAdmin,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
@@ -47,6 +48,20 @@ router.put(
   authorize("corporate"),
   upload.single("attachment"),
   updateProblem
+);
+
+router.get(
+  "/admin/all",
+  isAuthenticated,
+  authorize("admin"),
+  getAllProblemsAdmin
+);
+
+router.delete(
+  "/admin/:id",
+  isAuthenticated,
+  authorize("admin"),
+  deleteProblemAdmin
 );
 
 export default router;

@@ -74,6 +74,10 @@ const updateProblem = (problemId, problemData) => {
   );
 };
 
+const getAllProblemsAdmin = () => {
+  return axios.get(`${API_URL}/problems/admin/all`, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -86,6 +90,7 @@ const problemService = {
   getAllTags,
   deleteSolution,
   updateProblem,
+  getAllProblemsAdmin,
 };
 
 export default problemService;
