@@ -20,8 +20,11 @@ const Navbar = () => {
   return (
     <nav className="bg-[#E0E0E0] text-[#333333] font-mono font-bold p-4 mb-8 shadow-md">
       <div className="container h-5 flex justify-between items-center">
-        <Link to="/" className="flex items-center">
-          <img src={msmeLogo} alt="MSME Portal" className="h-16" />
+        <Link
+          to="/"
+          className="text-2xl font-extrabold tracking-tight text-gray-800"
+        >
+          MSME Portal
         </Link>
         <div className="flex items-center gap-3 text-lg">
           {/* Conditional rendering based on auth state */}
