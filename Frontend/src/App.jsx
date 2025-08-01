@@ -14,6 +14,7 @@ import ProfilePage from "./pages/Profile.page";
 import EditProfilePage from "./pages/editProfile.page";
 import EditProblemPage from "./pages/editProblem.page";
 import AdminPage from "./pages/admin.page";
+import EditAdminPage from "./pages/editAdmin.page.jsx";
 
 function App() {
   const { authUser, setAuthUser, setLoading } = useAuth();
@@ -53,6 +54,11 @@ function App() {
 
             <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/problems" element={<AdminPage />} />
+              <Route
+                path="/admin/problem/edit/:id"
+                element={<EditAdminPage />}
+              />
             </Route>
 
             <Route

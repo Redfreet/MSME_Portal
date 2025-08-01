@@ -249,13 +249,56 @@ export const deleteProblemAdmin = async (req, res) => {
     //Delete the problem itself
     await problem.deleteOne();
 
-    res
-      .status(200)
-      .json({
-        message: "Problem and all associated data deleted successfully.",
-      });
+    res.status(200).json({
+      message: "Problem and all associated data deleted successfully.",
+    });
   } catch (error) {
     console.error("Error in deleteProblemAdmin controller:", error.message);
     res.status(500).send("Internal Server Error");
+  }
+};
+
+export const updateProblemAdmin = async (req, res) => {
+  try {
+    const problem = await Problem.findById(req.params.id);
+
+    if (!problem) {
+      return res.status(404).json({ message: "Problem not found" });
+    }
+
+    const { title, description, skills_needed, tags, urgency, region, status } =
+      req.body;
+
+    if (title) problem.title = title;
+    if (description) problem.description = description;
+    if (urgency) problem.urgency = urgency;
+    if (region) problem.region = region;
+    if (status) problem.status = status;
+
+    if (typeof tags === "string") {
+      problem.tags = tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag);
+    }
+
+    if (typeof skills_needed === "string") {
+      problem.skills_needed = skills_needed
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter((skill) => skill);
+    }
+
+    if (req.file) {
+      problem.attachmentUrl = req.file.path;
+    }
+
+    const updatedProblem = await problem.save();
+    res.status(200).json(updatedProblem);
+  } catch (error) {
+    console.error("Error in updateProblemAdmin controller:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };

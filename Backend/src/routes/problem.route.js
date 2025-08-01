@@ -13,6 +13,7 @@ import {
   updateProblem,
   getAllProblemsAdmin,
   deleteProblemAdmin,
+  updateProblemAdmin,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
@@ -63,6 +64,14 @@ router.delete(
   isAuthenticated,
   authorize("admin"),
   deleteProblemAdmin
+);
+
+router.put(
+  "/admin/:id",
+  isAuthenticated,
+  authorize("admin"),
+  upload.single("attachment"),
+  updateProblemAdmin
 );
 
 export default router;

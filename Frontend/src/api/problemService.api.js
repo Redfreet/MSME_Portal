@@ -82,6 +82,33 @@ const deleteProblemAdmin = (problemId) => {
   return axios.delete(`${API_URL}/problems/admin/${problemId}`, config);
 };
 
+const updateProblemAdmin = (problemId, problemData) => {
+  const uploadConfig = {
+    ...config,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
+  return axios.put(
+    `${API_URL}/problems/admin/${problemId}`,
+    problemData,
+    uploadConfig
+  );
+};
+
+const getSolutionsAdmin = (problemId) => {
+  return axios.get(`${API_URL}/solutions/admin/problems/${problemId}`, config);
+};
+
+const deleteCommentAdmin = (solutionId, commentId) => {
+  return axios.put(
+    `${API_URL}/solutions/admin/solutions/${solutionId}/comments/${commentId}`,
+    {},
+    config
+  );
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -96,6 +123,9 @@ const problemService = {
   updateProblem,
   getAllProblemsAdmin,
   deleteProblemAdmin,
+  getSolutionsAdmin,
+  deleteCommentAdmin,
+  updateProblemAdmin,
 };
 
 export default problemService;

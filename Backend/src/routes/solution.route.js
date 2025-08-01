@@ -6,6 +6,8 @@ import {
   getSolutionsForProblem,
   toggleUpvoteSolution,
   deleteSolution,
+  deleteCommentFromSolution,
+  getSolutionsAdmin,
 } from "../controllers/solution.controller.js";
 
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
@@ -31,6 +33,20 @@ router.delete(
   isAuthenticated,
   authorize("collaborator", "corporate", "admin"),
   deleteSolution
+);
+
+router.put(
+  "/admin/solutions/:solutionId/comments/:commentId",
+  isAuthenticated,
+  authorize("admin"),
+  deleteCommentFromSolution
+);
+
+router.get(
+  "/admin/solutions/:id",
+  isAuthenticated,
+  authorize("admin"),
+  getSolutionsAdmin
 );
 
 export default router;

@@ -110,7 +110,7 @@ export const submitSolution = async (req, res) => {
 
     let savedSolution = await newSolution.save();
 
-    if (content.toLowerCase().includes("@narada")) {
+    if (/@narada/i.test(content)) {
       triggerNaradaSummary(problemId, savedSolution._id);
     }
 
@@ -241,6 +241,48 @@ export const deleteSolution = async (req, res) => {
       .json({ message: "Solution and all replies deleted successfully" });
   } catch (error) {
     console.error("Error in deleteSolution controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getSolutionsAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Problem ID" });
+    }
+
+    const solutions = await Solution.find({
+      problemId: new mongoose.Types.ObjectId(id),
+    }).populate("collaboratorId", "username fullName");
+
+    res.status(200).json(solutions);
+  } catch (error) {
+    console.error("Error fetching solutions for problem (Admin):", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const deleteCommentFromSolution = async (req, res) => {
+  try {
+    const { solutionId, commentId } = req.params;
+
+    const updatedSolution = await Solution.findByIdAndUpdate(
+      solutionId,
+      { $pull: { comments: { _id: commentId } } },
+      { new: true }
+    );
+
+    if (!updatedSolution) {
+      return res
+        .status(404)
+        .json({ message: "Solution or comment not found." });
+    }
+
+    res.status(200).json({ message: "Comment deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting embedded comment:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
