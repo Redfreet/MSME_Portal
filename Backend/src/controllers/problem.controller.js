@@ -21,6 +21,10 @@ export const createProblem = async (req, res) => {
       companyId: req.user.id,
     });
 
+    if (req.file) {
+      newProblem.attachmentUrl = req.file.path;
+    }
+
     const problem = await newProblem.save();
 
     // Create a new activity document after the problem is successfully saved.

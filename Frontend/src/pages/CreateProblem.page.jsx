@@ -8,6 +8,9 @@ const CreateProblemPage = () => {
     description: "",
     tags: "",
   });
+  const [attachment, setAttachment] = useState(null);
+  const [preview, setPreview] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -16,21 +19,35 @@ const CreateProblemPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAttachment(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const problemData = {
-        ...formData,
-        tags: formData.tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag),
-      };
+      const problemFormData = new FormData();
+      problemFormData.append("title", formData.title);
+      problemFormData.append("description", formData.description);
 
-      const response = await problemService.createProblem(problemData);
+      const tagsArray = formData.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag);
+      problemFormData.append("tags", tagsArray);
+
+      if (attachment) {
+        problemFormData.append("attachment", attachment);
+      }
+
+      const response = await problemService.createProblem(problemFormData);
 
       navigate(`/problem/${response.data._id}`);
     } catch (err) {
@@ -83,6 +100,31 @@ const CreateProblemPage = () => {
               value={formData.description}
               onChange={handleChange}
             ></textarea>
+          </div>
+          <div>
+            <label
+              htmlFor="attachment"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Attachment (Optional)
+            </label>
+            <input
+              type="file"
+              name="attachment"
+              id="attachment"
+              accept="image/png, image/jpeg, image/gif"
+              onChange={handleFileChange}
+              className="w-full text-sm text-gray-500 mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            {preview && (
+              <div className="mt-4">
+                <img
+                  src={preview}
+                  alt="Attachment Preview"
+                  className="max-h-48 rounded-lg shadow-sm"
+                />
+              </div>
+            )}
           </div>
 
           <div>

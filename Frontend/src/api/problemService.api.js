@@ -27,7 +27,13 @@ const submitSolution = (problemId, solutionData) => {
 };
 
 const createProblem = (problemData) => {
-  return axios.post(`${API_URL}/problems`, problemData, config);
+  const uploadConfig = {
+    ...config,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+  return axios.post(`${API_URL}/problems`, problemData, uploadConfig);
 };
 
 const upvoteSolution = (solutionId) => {

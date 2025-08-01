@@ -16,6 +16,9 @@ const problemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    attachmentUrl: {
+      type: String,
+    },
     skills_needed: {
       type: [String],
       default: [],

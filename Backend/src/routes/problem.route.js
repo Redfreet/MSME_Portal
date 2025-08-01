@@ -1,4 +1,8 @@
 import express from "express";
+import multer from "multer";
+import { storage } from "../utils/cloudinary.js";
+const upload = multer({ storage });
+
 import {
   createProblem,
   getAllProblems,
@@ -11,7 +15,13 @@ import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/", isAuthenticated, authorize("corporate"), createProblem);
+router.post(
+  "/",
+  isAuthenticated,
+  authorize("corporate"),
+  upload.single("attachment"),
+  createProblem
+);
 
 router.get("/", getAllProblems);
 

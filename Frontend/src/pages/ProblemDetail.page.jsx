@@ -163,6 +163,17 @@ const ProblemDetailPage = () => {
         <pre className="whitespace-pre-wrap text-gray-800 mb-4">
           {problem.description}
         </pre>
+
+        {problem.attachmentUrl && (
+          <div className="mt-6 border-t pt-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-2">Attachment</h3>
+            <img
+              src={problem.attachmentUrl}
+              alt="Problem Attachment"
+              className="max-w-full h-auto rounded-lg shadow-md"
+            />
+          </div>
+        )}
       </div>
 
       <div className="bg-white p-8 rounded-lg shadow-md">
