@@ -5,13 +5,13 @@ import User from "../models/user.model.js";
 
 const triggerNaradaSummary = async (problemId, parentSolutionId) => {
   try {
-    console.log("Narada mention detected. Triggering AI summary...");
+    // console.log("Narada mention detected. Triggering AI summary...");
 
     const naradaUser = await User.findOne({ username: "narada" });
     if (!naradaUser) {
-      console.error(
-        "Narada AI user not found in the database. Make sure the username is 'narada'."
-      );
+      // console.error(
+      //   "Narada AI user not found in the database. Make sure the username is 'narada'."
+      // );
       return;
     }
 
@@ -25,7 +25,13 @@ const triggerNaradaSummary = async (problemId, parentSolutionId) => {
     }
 
     const userDiscussion = allSolutions
-      .filter((s) => s.collaboratorId && s.collaboratorId.username !== "narada") // Ensure collaborator exists
+      .filter((s) => {
+        return (
+          s.collaboratorId &&
+          s.collaboratorId.username !== "narada" &&
+          s._id.toString() !== parentSolutionId.toString()
+        ); // Exclude the triggering comment
+      })
       .map((s) => `@${s.collaboratorId.username}: ${s.content}`);
 
     const discussionContext = userDiscussion.join("\n");
