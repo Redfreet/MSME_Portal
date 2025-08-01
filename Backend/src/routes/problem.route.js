@@ -12,6 +12,7 @@ import {
   getAllTags,
   updateProblem,
   getAllProblemsAdmin,
+  deleteProblemAdmin,
 } from "../controllers/problem.controller.js";
 import { isAuthenticated, authorize } from "../middleware/auth.middleware.js";
 
