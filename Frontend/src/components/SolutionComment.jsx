@@ -28,9 +28,9 @@ const SolutionComment = ({
     }
   };
 
-  const handleReplySuccess = () => {
+  const handleReplySuccess = (newReply) => {
     setShowReplyForm(false);
-    onReplySubmit();
+    onReplySubmit(newReply);
   };
 
   const handleDelete = async () => {
@@ -43,7 +43,7 @@ const SolutionComment = ({
     }
     try {
       await problemService.deleteSolution(solution._id);
-      onReplySubmit(); // Refetch all comments to update the UI
+      onReplySubmit();
     } catch (err) {
       console.error("Failed to delete solution:", err);
       alert("There was an error deleting this comment.");
