@@ -24,6 +24,19 @@ const AdminPage = () => {
     fetchAllProblems();
   }, []);
 
+  const handleDeleteProblem = async (problemId) => {
+    if (window.confirm("Are you sure you want to delete this problem?")) {
+      try {
+        await problemService.deleteProblemAdmin(problemId);
+        setProblems(problems.filter((problem) => problem._id !== problemId));
+        // console.log("Problem deleted successfully.");
+      } catch (err) {
+        console.error("Failed to delete problem:", err);
+        alert("Failed to delete the problem. Please try again.");
+      }
+    }
+  };
+
   if (loading) {
     return <p className="text-center mt-8">Loading Admin Panel...</p>;
   }
@@ -51,24 +64,28 @@ const AdminPage = () => {
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Company
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Status
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Urgency
                 </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
+
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -80,13 +97,13 @@ const AdminPage = () => {
                       {problem.title}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="text-sm text-gray-600">
                       {problem.companyId?.companyName ||
                         problem.companyId?.fullName}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         problem.status === "Open"
@@ -97,17 +114,24 @@ const AdminPage = () => {
                       {problem.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                     {problem.urgency}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      to={`/problem/${problem._id}`}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      View
-                    </Link>
-                    {/* We will add Edit/Delete functionality here later */}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center justify-center space-x-2">
+                      <Link
+                        to={`/problem/${problem._id}`}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        View
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteProblem(problem._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

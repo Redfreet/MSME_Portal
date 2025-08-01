@@ -78,6 +78,10 @@ const getAllProblemsAdmin = () => {
   return axios.get(`${API_URL}/problems/admin/all`, config);
 };
 
+const deleteProblemAdmin = (problemId) => {
+  return axios.delete(`${API_URL}/problems/admin/${problemId}`, config);
+};
+
 const problemService = {
   getAllProblems,
   getProblemById,
@@ -91,6 +95,7 @@ const problemService = {
   deleteSolution,
   updateProblem,
   getAllProblemsAdmin,
+  deleteProblemAdmin,
 };
 
 export default problemService;

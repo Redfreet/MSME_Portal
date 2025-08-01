@@ -47,6 +47,15 @@ const Navbar = () => {
                 </Link>
               )}
 
+              {authUser.role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="uppercase border border-gray-700 hover:border-blue-800 hover:text-blue-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 text-base"
+                >
+                  Admin Panel
+                </Link>
+              )}
+
               <button
                 onClick={handleLogout}
                 className=" uppercase border border-gray-700 hover:border-red-800 hover:text-red-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50 text-base"
