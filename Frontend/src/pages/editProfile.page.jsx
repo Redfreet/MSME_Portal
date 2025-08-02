@@ -79,14 +79,14 @@ const EditProfilePage = () => {
     setIsUploading(true);
     setError("");
 
-    console.log("Attempting to upload photo. File:", photoFile);
+    // console.log("Attempting to upload photo. File:", photoFile);
     try {
       const uploadFormData = new FormData();
       uploadFormData.append("profilePhoto", photoFile);
 
-      console.log("Calling authService.updateProfilePicture...");
+      // console.log("Calling authService.updateProfilePicture...");
       const response = await authService.updateProfilePicture(uploadFormData);
-      console.log("Upload successful. Response:", response.data);
+      // console.log("Upload successful. Response:", response.data);
 
       setAuthUser(response.data);
       setSuccess("Profile picture updated successfully!");

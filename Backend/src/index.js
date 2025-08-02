@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
-app.set('trust proxy', 1); //chrome cokkie prblm
+app.set("trust proxy", 1); //chrome cokkie prblm
 
 const corsOptions = {
   // origin: "http://localhost:5173",
@@ -34,6 +34,6 @@ app.use("/api/solutions", solutionRoutes);
 app.use("/api/industries", industryRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server is listening at port ${PORT}`);
+  // console.log(`Server is listening at port ${PORT}`);
   connectDB();
 });

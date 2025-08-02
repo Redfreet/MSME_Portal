@@ -70,7 +70,7 @@ const triggerNaradaSummary = async (problemId, parentSolutionId) => {
         parentSolution: parentSolutionId,
       });
       await naradaReply.save();
-      console.log("Narada has posted a summary.");
+      // console.log("Narada has posted a summary.");
     }
   } catch (error) {
     console.error("Error in triggerNaradaSummary:", error.message);
@@ -81,7 +81,7 @@ export const submitSolution = async (req, res) => {
   const { problemId } = req.params;
   const { content, parentSolution } = req.body;
 
-  console.log("Submitting solution. Request body:", req.body);
+  // console.log("Submitting solution. Request body:", req.body);
 
   if (!content) {
     return res

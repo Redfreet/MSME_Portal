@@ -56,7 +56,7 @@ const ProblemDetailPage = () => {
 
       if (isNaradaMentioned) {
         setIsNaradaThinking(true);
-        console.log("Narada mentioned. Waiting for AI summary...");
+        // console.log("Narada mentioned. Waiting for AI summary...");
 
         setTimeout(() => {
           fetchSolutions();

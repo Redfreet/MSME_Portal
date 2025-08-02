@@ -139,7 +139,8 @@ export const login = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: "none",
-        secure: process.env.NODE_ENV !== "development",
+        secure: true,
+        partitioned: true,
       })
       .json({
         _id: user._id,
@@ -176,9 +177,9 @@ export const logout = (req, res) => {
 export const getUserActivity = async (req, res) => {
   try {
     const userId = req.user._id;
-    console.log(
-      `Fetching activity feed from Activity collection for user: ${userId}`
-    );
+    // console.log(
+    //   `Fetching activity feed from Activity collection for user: ${userId}`
+    // );
 
     const activities = await Activity.find({ userId: userId })
       .sort({ createdAt: -1 }) // most recent first
