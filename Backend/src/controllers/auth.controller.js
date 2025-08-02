@@ -139,7 +139,7 @@ export const login = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: "none",
-        secure: true,
+        secure: process.env.NODE_ENV !== "development",
       })
       .json({
         _id: user._id,
@@ -160,7 +160,12 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    res.cookie("jwt", "", {
+      expires: new Date(0),
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in login controller");

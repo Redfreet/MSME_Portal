@@ -3,6 +3,9 @@ import User from "../models/user.model.js";
 
 export const isAuthenticated = async (req, res, next) => {
   try {
+    console.log("--- New Authenticated Request ---");
+    console.log("Request Origin:", req.headers.origin);
+    console.log("Cookies Received by Server:", req.cookies);
     const token = req.cookies.jwt;
     if (!token) {
       return res.status(401).json({
