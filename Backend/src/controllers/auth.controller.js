@@ -140,6 +140,7 @@ export const login = async (req, res) => {
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        partitioned: true,
       })
       .json({
         _id: user._id,
