@@ -121,42 +121,43 @@ const ProblemDetailPage = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white p-8 rounded-lg shadow-md mb-8">
-        <div className="flex justify-between items-start gap-1">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-1">
           <div className="flex-grow mr-4">
             <p className="text-sm text-gray-500 font-semibold">
               {problem.companyId?.companyName
                 ? `${problem.companyId.companyName} (${problem.companyId.fullName})`
                 : problem.companyId?.fullName || "A Company"}
             </p>
-            <h1 className="text-4xl font-bold text-gray-900 mt-2">
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mt-2">
               {problem.title}
             </h1>
           </div>
-
-          {/* Show button only if user is owner and problem is open */}
-          {isOwner && problem.status === "Open" && (
-            <>
-              <Link
-                to={`/problem/${problem._id}/edit`}
-                className="uppercase border border-gray-700 hover:border-blue-800 hover:text-blue-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 text-base  disabled:bg-blue-300"
-              >
-                Edit
-              </Link>
-              <button
-                onClick={handleCloseProblem}
-                disabled={isUpdatingStatus}
-                className="uppercase border border-gray-700 hover:border-red-800 hover:text-red-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50 text-base disabled:bg-red-300"
-              >
-                {isUpdatingStatus ? "Closing..." : "Close"}
-              </button>
-            </>
-          )}
-          {/* Show a badge if the problem is closed */}
-          {problem.status !== "Open" && (
-            <span className="bg-gray-200 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
-              {problem.status}
-            </span>
-          )}
+          <div className="flex items-center gap-2 flex-shrink-0 mt-2 sm:mt-0">
+            {/* Show button only if user is owner and problem is open */}
+            {isOwner && problem.status === "Open" && (
+              <>
+                <Link
+                  to={`/problem/${problem._id}/edit`}
+                  className="uppercase border border-gray-700 hover:border-blue-800 hover:text-blue-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 text-base  disabled:bg-blue-300"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={handleCloseProblem}
+                  disabled={isUpdatingStatus}
+                  className="uppercase border border-gray-700 hover:border-red-800 hover:text-red-700 px-5 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50 text-base disabled:bg-red-300"
+                >
+                  {isUpdatingStatus ? "Closing..." : "Close"}
+                </button>
+              </>
+            )}
+            {/* Show a badge if the problem is closed */}
+            {problem.status !== "Open" && (
+              <span className="bg-gray-200 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
+                {problem.status}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex flex-wrap gap-2 my-4">
           {problem.tags?.map((tag) => (

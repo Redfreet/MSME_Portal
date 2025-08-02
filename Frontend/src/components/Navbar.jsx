@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContent";
 import authService from "../api/authService.js";
@@ -5,6 +6,7 @@ import authService from "../api/authService.js";
 const Navbar = () => {
   const { authUser, setAuthUser, loading } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -25,7 +27,7 @@ const Navbar = () => {
         >
           MSME Portal
         </Link>
-        <div className="flex items-center gap-3 text-lg">
+        <div className="hidden md:flex items-center gap-3 text-lg">
           {/* Conditional rendering based on auth state */}
           {loading ? (
             <span>Loading...</span>
@@ -88,7 +90,95 @@ const Navbar = () => {
             </>
           )}
         </div>
+
+        {/*Hamburger Menu Button for small screens)*/}
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {isMenuOpen && (
+        <div className="md:hidden mt-1">
+          <div className="flex flex-col items-center text-center">
+            {loading ? (
+              <span></span>
+            ) : authUser ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="w-full py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Welcome, {authUser.fullName.split(" ")[0]}!
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="w-full py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                {authUser.role === "corporate" && (
+                  <Link
+                    to="/create-problem"
+                    className="w-full py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Post Problem
+                  </Link>
+                )}
+                {authUser.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="w-full py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2 text-red-600"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="w-full py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="w-full py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

@@ -77,7 +77,7 @@ const HomePage = () => {
     <div className="font-mono flex flex-col md:flex-row gap-8">
       {/* --- Sidebar for Industry Filtering --- */}
       <aside className="w-full md:w-1/4 lg:w-1/5">
-        <div className="bg-white p-4 rounded-lg shadow-md sticky top-24 space-y-6">
+        <div className="bg-white p-4 rounded-lg shadow-md top-24 space-y-6">
           {/* Industry Filter */}
           <div>
             <h2 className="text-lg font-bold mb-2 border-b pb-2">Industries</h2>

@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "./SolutionForm";
 import problemService from "../api/problemService.api.js";
+import { FaThumbsUp, FaChevronRight } from "react-icons/fa";
 
 const SolutionComment = ({
   solution,
@@ -64,7 +65,7 @@ const SolutionComment = ({
   return (
     <div className="flex">
       {/* Vertical line for nesting */}
-      <div className="mr-4 flex flex-col items-center">
+      <div className="mr-2 sm:mr-4 flex flex-col items-center">
         <img
           src={profilePicSrc}
           alt={solution.collaboratorId?.fullName}
@@ -81,7 +82,7 @@ const SolutionComment = ({
           className="bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
           onClick={toggleReplies} // Click to toggle replies
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center text-sm">
               <p className="font-bold text-gray-800">
                 {solution.collaboratorId?.fullName}
@@ -100,14 +101,14 @@ const SolutionComment = ({
                 e.stopPropagation();
                 onUpvote(solution._id);
               }}
-              className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs transition-colors ${
+              className={`flex items-center self-start sm:self-center w-min space-x-2 px-3 py-1 rounded-full text-xs transition-colors ${
                 isUpvoted
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
               disabled={!authUser}
             >
-              <span>👍</span>
+              <FaThumbsUp />
               <span>{solution.upvotes?.length || 0}</span>
             </button>
           </div>
@@ -138,11 +139,14 @@ const SolutionComment = ({
             )}
             {hasReplies && (
               <span
-                className={`ml-auto text-gray-600 text-xl transition-transform duration-200 ${
-                  isExpanded ? "rotate-90" : ""
-                }`}
+                style={{ cursor: "pointer" }}
+                className="ml-auto text-gray-500"
               >
-                &#9658;
+                <FaChevronRight
+                  className={`transition-transform duration-200 ${
+                    isExpanded ? "rotate-90" : ""
+                  }`}
+                />
               </span>
             )}
           </div>
