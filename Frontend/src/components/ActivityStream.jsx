@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import authService from "../api/authService.js";
 import { Link } from "react-router-dom";
+import { FaPencilAlt, FaCheckCircle, FaThumbsUp, FaBell } from "react-icons/fa";
 
 const timeAgo = (dateString) => {
   const date = new Date(dateString);
@@ -19,21 +20,16 @@ const timeAgo = (dateString) => {
 };
 
 const ActivityIcon = ({ type }) => {
-  let icon;
   switch (type) {
     case "POSTED_PROBLEM":
-      icon = "📝";
-      break;
+      return <FaPencilAlt className="text-blue-500" />;
     case "SUBMITTED_SOLUTION":
-      icon = "✅";
-      break;
+      return <FaCheckCircle className="text-green-500" />;
     case "UPVOTED_SOLUTION":
-      icon = "👍";
-      break;
+      return <FaThumbsUp className="text-indigo-500" />;
     default:
-      icon = "🔔";
+      return <FaBell className="text-yellow-500" />;
   }
-  return <span className="text-xl">{icon}</span>;
 };
 
 const ActivityStream = () => {
