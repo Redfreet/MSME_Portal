@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContent";
 import SolutionForm from "./SolutionForm";
 import problemService from "../api/problemService.api.js";
-import { FaThumbsUp, FaChevronRight } from "react-icons/fa";
+import { FaThumbsUp, FaChevronRight, FaCircle } from "react-icons/fa";
 
 const SolutionComment = ({
   solution,
@@ -84,14 +84,16 @@ const SolutionComment = ({
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center text-sm">
-              <p className="font-bold text-gray-800">
-                {solution.collaboratorId?.fullName}
-                <span className="text-gray-500 font-normal ml-2">
+              <div>
+                <p className="font-bold text-gray-800">
+                  {solution.collaboratorId?.fullName}
+                </p>
+                <p className="text-xs text-gray-500">
                   @{solution.collaboratorId?.username}
-                </span>
-              </p>
+                </p>
+              </div>
               {/* --- DATE ADDED BACK --- */}
-              <span className="text-xs text-gray-400 mx-2">•</span>
+              <FaCircle className="text-gray-400 text-[5px] mx-2" />
               <p className="text-xs text-gray-400">
                 {new Date(solution.createdAt).toLocaleDateString()}
               </p>
