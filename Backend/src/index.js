@@ -13,6 +13,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
+
+app.set('trust proxy', 1); //chrome cokkie prblm
+
 const corsOptions = {
   // origin: "http://localhost:5173",
   origin: "https://msmeportal.vercel.app",
