@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContent";
 import authService from "../api/authService.js";
-import msmeLogo from "../img/msme.png";
 
 const Navbar = () => {
   const { authUser, setAuthUser, loading } = useAuth();
